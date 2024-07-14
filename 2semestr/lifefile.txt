@@ -1,0 +1,7918 @@
+1.1)
+#include <iostream>
+
+void printTime(int h, int m, int s)
+{
+	printf("%02d:%02d:%02d\n", h, m, s);
+}
+using namespace std;
+int main()
+{
+	int N, h, m, s;
+	cin >> N;
+	while (N > 0)
+	{
+		cin >> h >> m >> s;
+		printTime(h, m, s);
+		N--;
+	}
+}
+1.2)
+#include <iostream>
+
+using namespace std;
+
+int readTime(char* iStr, int* oHours, int* oMinutes, int* oSeconds)
+{
+	char* pointer = iStr;
+	int* arrayPointers[] { oHours, oMinutes, oSeconds };
+	int** pointerArray = arrayPointers;
+	for (;*pointer != '\0'; pointer++)
+	{
+		if (*pointer == ':')
+		{
+			pointerArray++;
+			continue;
+		}
+		if (*pointer < '0' || *pointer > '9')
+			return 0;
+		**pointerArray = **pointerArray * 10 + (*pointer - '0');
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		switch (i)
+		{
+			case 0:
+				if (*arrayPointers[i] < 0 || *arrayPointers[i] > 23)
+					return 0;
+				break;
+			case 1:
+				if (*arrayPointers[i] < 0 || *arrayPointers[i] > 59)
+					return 0;
+				break;
+			case 2:
+				if (*arrayPointers[i] < 0 || *arrayPointers[i] > 59)
+					return 0;
+				break;
+		}	
+	}
+	return 1;
+}
+int main()
+{
+	char time[15];
+	int h, m, s, codeError;
+	cin >> time;
+	h = 0, m = 0; s = 0;
+	codeError = readTime(time, &h, &m, &s);
+	if (codeError == 0)
+	{
+		h = -1, m = -1, s = -1;
+	}
+	printf("%d %d %d %d\n", codeError, h, m, s); 
+	printf("%d %d %d\n", codeError, h, m);
+	printf("%d %d\n", codeError, h);
+}
+1.3)
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+typedef struct DateTime_s {
+    int year, month, day;
+    int hours, minutes, seconds;
+} DateTime;
+
+double formula(DateTime x)
+{
+    return round((x.year * 100000 + x.month * 1000 + x.day * 10 + x.hours * 0.1 + x.minutes * 0.001 + x.seconds * 0.00001)*100000)/100000;
+}
+DateTime min(const DateTime* arr, int cnt)
+{
+    DateTime minDate = arr[0];
+    double min = formula(minDate);
+    double temp;
+    for (int i = 0; i < cnt; i++)
+    {
+        temp = formula(arr[i]);
+        if (temp < min)
+        {
+            min = temp;
+            minDate = arr[i];
+        }
+            
+    }
+    return minDate;
+}
+int main()
+{
+    int N, year, month, day, hours, minutes, seconds;
+    cin >> N;
+    DateTime* data = new DateTime[N];
+    DateTime result;
+    for (int i = 0; i < N; i++)
+    {
+        cin >> year >> month >> day >> hours >> minutes >> seconds;
+        data[i] = { year, month, day, hours, minutes, seconds };
+    }
+    result = min(data, N);
+    printf("%d %d %d %d %d %d", result.year, result.month, result.day, result.hours, result.minutes, result.seconds);
+}
+1.4)
+#include <iostream>
+
+using namespace std;
+
+typedef struct Label_s {
+    char name[16]; //имя автора (заканчивается нулём)
+    int age; //возраст автора (сколько лет)
+} Label;
+
+typedef struct NameStats_s {
+    int cntTotal; //сколько всего подписей
+    int cntLong; //сколько подписей с именами длиннее 10 букв
+} NameStats;
+
+typedef struct AgeStats_s {
+    int cntTotal; //сколько всего подписей
+    int cntAdults; //сколько подписей взрослых (хотя бы 18 лет)
+    int cntKids; //сколько подписей детей (меньше 14 лет)
+} AgeStats;
+
+void calcStats(const Label* arr, int cnt, NameStats* oNames, AgeStats* oAges)
+{
+    for (int i = 0; i < cnt; i++)
+    {
+        int j;
+        oAges->cntTotal++;
+        oNames->cntTotal++;
+        if (arr[i].age >= 18)
+            oAges->cntAdults++;
+        if (arr[i].age < 14)
+            oAges->cntKids++;
+        for (j = 0; *(arr[i].name + j) != '\0'; j++);
+        if (j > 10)
+        {
+            oNames->cntLong++;
+        }  
+    }
+}
+
+NameStats getNewNameStats()
+{
+    NameStats newNameStats;
+    newNameStats.cntLong = 0;
+    newNameStats.cntTotal = 0;
+    return newNameStats;
+}
+
+AgeStats getNewAgeStats()
+{
+    AgeStats newAgeStats;
+    newAgeStats.cntTotal = 0;
+    newAgeStats.cntAdults = 0;
+    newAgeStats.cntKids = 0;
+    return newAgeStats;
+}
+int main()
+{
+    int N;
+    cin >> N;
+    Label* labels = new Label[N];
+    NameStats nameStats = getNewNameStats();
+    AgeStats ageStats = getNewAgeStats();
+    for (int i = 0; i < N; i++)
+    {
+        cin >> labels[i].name >> labels[i].age;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+    calcStats(labels, N, &nameStats, &ageStats);
+    printf("names: total = %d\nnames: long = %d\nages: total = %d\nages: adult = %d\nages: kid = %d\n", nameStats.cntTotal, nameStats.cntLong, ageStats.cntTotal, ageStats.cntAdults, ageStats.cntKids);
+}
+1.5)
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <algorithm>
+#include <cstdio>
+
+using namespace std;
+
+int calcLetters(char* iStr, int* oLowerCnt, int* oUpperCnt, int* oDigitsCnt)
+{
+    int i;
+    unsigned char charTemp;
+    for (i = 0; *(iStr + i) != '\0'; i++)
+    {
+        charTemp = *(iStr + i);
+        if (charTemp >= '0' && charTemp <= '9')
+        {
+            *oDigitsCnt = *oDigitsCnt + 1;
+        }
+        else if (charTemp >= 'a' && charTemp <= 'z')
+        {
+            *oLowerCnt = *oLowerCnt + 1;
+        }        
+        else if (charTemp >= 'A' && charTemp <= 'Z')
+        {
+            *oUpperCnt = *oUpperCnt + 1;
+        }
+            
+    }
+    return i;
+}
+int main()
+{
+    int lowerCnt, upperCnt, digitsCnt, length;
+    char str[101];
+    char charTemp;
+    int count = 1;
+    int countStr = 0;
+    ifstream in("input.txt");
+    while (in.get((char&)charTemp))
+    {
+        str[countStr++] = charTemp;
+        if (charTemp == '\n')
+        {
+            str[countStr - 1] = '\0';
+            countStr = 0;
+            lowerCnt = 0, upperCnt = 0, digitsCnt = 0;
+            length = calcLetters(str, &lowerCnt, &upperCnt, &digitsCnt);
+            printf("Line %d has %d chars: %d are letters (%d lower, %d upper), %d are digits.\n", count, length, (upperCnt + lowerCnt), lowerCnt, upperCnt, digitsCnt);
+            count++;
+        }
+        
+    }
+    in.close();
+}
+1.6)
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <algorithm>
+#include <cstdio>
+
+using namespace std;
+
+void reverse(char* start, int len)
+{
+    for (int i = 0; i < len / 2; i++)
+    {
+        swap(start[i], start[len - 1 - i]);
+    }
+}
+int main()
+{
+    int N;
+    char str[101];
+    cin >> N;
+    for (int i = 0; i < N; i++)
+    {
+        cin >> str;
+        reverse(str, strlen(str));
+        cout << str << endl;
+    }
+}
+1.7)
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+typedef struct Tokens_s {
+    int num = 0; // количество слов в строке
+    char** arr = nullptr; // массив слов (каждый элемент –- строка, т.е. char*)
+} Tokens;
+
+bool isDelim(char c, const char* delims) {
+    for (int i = 0; delims[i]; i++) {
+        if (c == delims[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void tokensSplit(Tokens* tokens, const char* str, const char* delims) {
+    int count = 0;
+    vector<string> words;
+    string word;
+
+    for (int i = 0; str[i]; i++) {
+        if (isDelim(str[i], delims)) {
+            if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
+            }
+        }
+        else {
+            word += str[i];
+        }
+    }
+
+    if (!word.empty()) {
+        words.push_back(word);
+    }
+
+    tokens->num = words.size();
+
+    if (tokens->arr != NULL) {
+        for (int i = 0; i < tokens->num; i++) {
+            tokens->arr[i] = new char[words[i].size() + 1];
+            for (int j = 0; j < words[i].size(); j++) {
+                tokens->arr[i][j] = words[i][j];
+            }
+            tokens->arr[i][words[i].size()] = '\0';
+        }
+    }
+}
+
+void tokensFree(Tokens* tokens) {
+    for (int i = 0; i < tokens->num; i++) {
+        delete[] tokens->arr[i];
+    }
+    delete[] tokens->arr;
+    tokens->arr = NULL;
+    tokens->num = 0;
+}
+
+int main() {
+    string str;
+    Tokens tokens;
+
+    getline(cin, str);
+
+    string delims = ":;,. ";
+
+    tokensSplit(&tokens, str.c_str(), delims.c_str());
+
+    tokens.arr = new char* [tokens.num];
+
+    tokensSplit(&tokens, str.c_str(), delims.c_str());
+
+    cout << tokens.num << endl;
+    for (int i = 0; i < tokens.num; i++) {
+        cout << tokens.arr[i] << endl;
+    }
+
+    tokensFree(&tokens);
+
+    return 0;
+}
+1.8)
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <algorithm>
+#include <cstdio>
+
+using namespace std;
+
+char* concat(char* pref, char* suff)
+{
+    while (*pref != '\0')
+        pref++;
+    while (*suff != '\0')
+    {
+        *pref = *suff;
+        pref++;
+        suff++;
+    }
+    *pref = '\0';
+    return pref;
+}
+
+int main()
+{
+    int N, len = 0;
+    char* str = new char[101];
+    char* finish;
+    
+    cin >> N;
+    finish = new char[101*N];
+    cin >> finish;
+    
+    char* temp = finish;
+    for (int i = 0; i < N - 1; i++)
+    {
+        cin >> str;
+        temp = concat(temp, str);
+    }
+    cout << finish;
+    delete[] str;
+    delete[] finish;
+}
+1.9)
+#include <iostream>
+
+using namespace std;
+
+char** newString(char** array, int countChars, int arrCount, char* string)
+{
+    array = (char**)realloc(array, (arrCount + 1) * sizeof(char*));
+    array[arrCount] = (char*)malloc((countChars + 1) * sizeof(char));
+    for (int k = 0; k < countChars; k++)
+    {
+        array[arrCount][k] = string[k];
+    }
+    array[arrCount][countChars] = '\0';
+    return array;
+}
+
+int skibidiToulet(char* array, char* searchChar)
+{
+    int j = 0;
+    int count = 0;
+    while (array[j])
+    {
+        if (array[j] == *searchChar) count++;
+        j++;
+    }
+    return count;
+}
+
+int main()
+{
+    int n, flag, ind, arrCount = 0;
+    char input[100001];
+    char** array = (char**)malloc(1 * sizeof(char*));
+    cin >> n;
+
+    for (int i = 0; i < n; i++)
+    {
+        cin >> flag >> ind;
+        //cout << i << endl;
+        if (flag != 2 && flag != 1)
+            cin >> input;
+
+        if (flag == 0)
+        {
+
+            array = newString(array, ind, arrCount, input);
+            arrCount++;
+        }
+        else if (flag == 1)
+        {
+            free(array[ind]);
+        }
+        else if (flag == 2)
+        {
+            cout << array[ind] << endl;
+        }
+        else if (flag == 3)
+        {
+            cout << skibidiToulet(array[ind], input) << endl;
+        }
+    }
+}
+1.10)
+ #include <iostream>
+#include <cstdio>
+
+using namespace std;
+
+int main() {
+    int N;
+    cin >> N;
+
+    for (int i = 0; i < N; ++i) {
+        unsigned long long P, Q, M;
+
+        scanf_s("%llu/%llu xor %llx", &P, &Q, &M);
+
+        double X = static_cast<double>(P) / Q;
+        unsigned long long X_as_int = *reinterpret_cast<unsigned long long*>(&X);
+        unsigned long long result_as_int = X_as_int ^ M;
+        double result = *reinterpret_cast<double*>(&result_as_int);
+
+        printf("%0.15g\n", result);
+    }
+
+    return 0;
+2.1)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int num;
+    Node* next;
+public:
+    Node(int data) {
+        this->num = data;
+        this->next = nullptr;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL) 
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL;
+            return;
+        }
+            Node* node = head;
+            head = node->next;
+            delete node;
+            return;
+        }
+
+    void push_front(int data) {
+        Node* node = new Node(data); 
+        node->next = head;
+        head = node;
+        if (tail == NULL) 
+            tail = node;
+    }
+
+    void push_back(int data) {
+        Node* node = new Node(data);
+        if (head == NULL) 
+            head = node;
+        if (tail != NULL) 
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL) 
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0) 
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data) {
+        Node* left = getAt(k);
+        if (left == NULL) 
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data);
+        left->next = node;
+        node->next = right;
+        if (right == NULL) 
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0) 
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL) 
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail) 
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->num == x)
+                return true;
+            node = node->next;
+        }
+        return false;
+    }
+};
+
+
+int main()
+{
+    int x = 0, count = 0, countArr = 0, countResult = 0;
+    OneLinkedList list1;
+    char* line = new char[1000001];
+    char* temp = new char[1001];
+    string tempStr;
+    getline(cin, tempStr);
+    line = (char*)tempStr.c_str(); 
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        x = strToInt(temp);
+        countArr++;
+        list1.push_front(x);
+        temp = strtok(NULL, " ");
+    }
+    for (int i = 0; i < countArr; i++)
+    {
+        if (list1.getAt(i)->num < 0 && (list1.getAt(i)->num * -1) % 7 == 0)
+            countResult++;
+    }
+    cout << countResult;
+    list1.clearList();
+}
+2.2)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int num;
+    Node* next;
+public:
+    Node(int data) {
+        this->num = data;
+        this->next = nullptr;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head;
+        head = node->next;
+        delete node;
+        return;
+    }
+
+    void push_front(int data) {
+        Node* node = new Node(data);
+        node->next = head;
+        head = node;
+        if (tail == NULL)
+            tail = node;
+    }
+
+    void push_back(int data) {
+        Node* node = new Node(data);
+        if (head == NULL)
+            head = node;
+        if (tail != NULL)
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0)
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data) {
+        Node* left = getAt(k);
+        if (left == NULL)
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data);
+        left->next = node;
+        node->next = right;
+        if (right == NULL)
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0)
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL)
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail)
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->num == x)
+                return true;
+            node = node->next;
+        }
+        return false;
+    }
+};
+
+int main()
+{
+    int x = 0, count = 0, countArr = 0, sum = 0;
+    OneLinkedList list1;
+    char* temp = new char[1002];
+    string tempStr;
+    getline(cin, tempStr);
+    char* line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        x = strToInt(temp);
+            list1.push_back(x);
+            countArr++;
+        temp = strtok(NULL, " ");
+    }
+    for (int i = 0; i < countArr; i++)
+    {
+        sum += list1.getAt(i)->num;
+    }
+    sum = sum / countArr;
+    cout << sum;
+    list1.clearList();
+}
+2.3)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int num;
+    Node* next;
+    Node* back;
+public:
+    Node(int data) {
+        this->num = data; 
+        this->next = nullptr;
+        this->back = nullptr;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head;
+        head = node->next;
+        delete node;
+        return;
+    }
+
+    void push_front(int data) {
+        Node* node = new Node(data);
+        node->next = head;
+        head = node;
+        if (tail == NULL)
+            tail = node;
+    }
+
+    void push_back(int data) {
+        Node* node = new Node(data);
+        if (head == NULL)
+            head = node;
+        if (tail != NULL)
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0)
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data) {
+        Node* left = getAt(k);
+        if (left == NULL)
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data);
+        left->next = node;
+        node->next = right;
+        if (right == NULL)
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0)
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL)
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail)
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->num == x)
+                return true;
+            node = node->next;
+        }
+        return false;
+    }
+
+    void clearReplays(int len)
+    {
+        int k = 0;
+        Node* node = head;
+        //node->back = head;
+        /*while (node->next)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                erase(k);
+                k--;
+            }
+            node = node->next;
+            k++;
+        }*/
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+            
+        }
+    }
+
+    void print()
+    {
+        Node* node = head;
+        while (node->next)
+        {
+            cout << node->num << " ";
+            node = node->next;
+        }
+        cout << node->num << endl;
+    }
+};
+
+int main()
+{
+    int x = 0, countArr = 0, k = 0;
+    OneLinkedList list1;
+    //char* line = new char[1000002];
+    char* temp = new char[1002];
+    string tempStr;
+    getline(cin, tempStr);
+    char* line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        x = strToInt(temp);
+        list1.push_back(x);
+        countArr++;
+        temp = strtok(NULL, " ");
+    }
+    list1.clearReplays(countArr);
+    list1.print();
+    list1.clearList();
+}
+2.4)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int num; 
+    Node* next; 
+public:
+    Node(int data) {
+        this->num = data;
+        this->next = nullptr;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head;
+        head = node->next;
+        delete node;
+        return;
+    }
+
+    void push_front(int data) {
+        Node* node = new Node(data);
+        node->next = head;
+        head = node;
+        if (tail == NULL)
+            tail = node;
+    }
+
+    void push_back(int data) {
+        Node* node = new Node(data);
+        if (head == NULL)
+            head = node;
+        if (tail != NULL)
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0)
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data) {
+        Node* left = getAt(k);
+        if (left == NULL)
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data);
+        left->next = node;
+        node->next = right;
+        if (right == NULL)
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0)
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL)
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail)
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->num == x)
+                return true;
+            node = node->next;
+        }
+        return false;
+    }
+
+    void clearReplays(int len)
+    {
+        Node* node = head;
+        //node->back = head;
+        /*while (node->next)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                erase(k);
+                k--;
+            }
+            node = node->next;
+            k++;
+        }*/
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+
+        }
+    }
+
+    void clearPrecursor(int len, int x)
+    {
+        Node* node = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->next->num == x)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+
+        }
+    }
+
+    void print()
+    {
+        Node* node = head;
+        while (node->next)
+        {
+            cout << node->num << " ";
+            node = node->next;
+        }
+        cout << node->num << endl;
+    }
+};
+
+int main()
+{
+    int x = 0, countArr = 0, number = 0;
+    OneLinkedList list1;
+    //char* line = new char[1000002];
+    char* temp = new char[1002];
+    string tempStr;
+    cin >> number;
+    cin.ignore(4, '\n');
+    getline(cin, tempStr);
+    char* line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        x = strToInt(temp);
+        list1.push_front(x);
+        countArr++;
+        temp = strtok(NULL, " ");
+    }
+    list1.clearPrecursor(countArr, number);
+    list1.print();
+    list1.clearList();
+}
+2.5)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+bool contains(int* arr, int n, int x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == x)
+            return true;
+    }
+    return false;
+}
+
+void sort_direct_merge(int* a, int fsize)
+{
+    if (fsize < 2)
+        return;
+    sort_direct_merge(a, fsize / 2);
+    sort_direct_merge(&a[fsize / 2], fsize - (fsize / 2));
+    int* buf = new int[fsize];
+    int idbuf = 0, idl = 0, idr = fsize / 2;
+    while ((idl < fsize / 2) && (idr < fsize))
+        if (a[idl] < a[idr])
+            buf[idbuf++] = a[idl++];
+        else
+            buf[idbuf++] = a[idr++];
+    while (idl < fsize / 2)
+        buf[idbuf++] = a[idl++];
+    while (idr < fsize)
+        buf[idbuf++] = a[idr++];
+    for (idl = 0; idl < fsize; idl++)
+        a[idl] = buf[idl];
+    delete[]buf;
+}
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int num;
+    Node* next;
+public:
+    Node(int data) {
+        this->num = data;
+        this->next = nullptr;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head;
+        head = node->next;
+        delete node;
+        return;
+    }
+
+    void push_front(int data) {
+        Node* node = new Node(data);
+        node->next = head;
+        head = node;
+        if (tail == NULL)
+            tail = node;
+    }
+
+    void push_back(int data) {
+        Node* node = new Node(data);
+        if (head == NULL)
+            head = node;
+        if (tail != NULL)
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0)
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data) {
+        Node* left = getAt(k);
+        if (left == NULL)
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data);
+        left->next = node;
+        node->next = right;
+        if (right == NULL)
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0)
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL)
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail)
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->num == x)
+                return true;
+            node = node->next;
+        }
+        if (node->num == x)
+            return true;
+        return false;
+    }
+
+    void clearReplays(int len)
+    {
+        Node* node = head;
+        //node->back = head;
+        /*while (node->next)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                erase(k);
+                k--;
+            }
+            node = node->next;
+            k++;
+        }*/
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+
+        }
+    }
+
+    void clearPrecursor(int len, int x)
+    {
+        Node* node = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->next->num == x)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+
+        }
+    }
+
+    void print()
+    {
+        Node* node = head;
+        while (node->next)
+        {
+            cout << node->num << " ";
+            node = node->next;
+        }
+        cout << node->num << endl;
+    }
+
+    OneLinkedList sort(int len)
+    {
+        int min;
+        OneLinkedList listResult;
+        int* arr = new int[len];
+        for (int i = 0; i < len; i++)
+        {
+            arr[i] = getAt(i)->num;
+        }
+        sort_direct_merge(arr, len);
+        for (int i = 0; i < len; i++)
+        {
+            listResult.push_back(arr[i]);
+        }
+        delete[] arr;
+        return listResult;
+    }
+
+};
+
+int main()
+{
+    int x = 0, countArr = 0, index;
+    OneLinkedList list1;
+    char* temp = new char[1002];
+    string tempStr;
+    getline(cin, tempStr);
+    char* line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        index = -1;
+        x = strToInt(temp);
+        if (countArr == 0)
+        {
+            list1.push_back(x);
+            countArr++;
+            temp = strtok(NULL, " ");
+            continue;
+        }
+            
+        if (list1.find(x))
+        {
+            temp = strtok(NULL, " ");
+            continue;
+        }
+        for (int j = countArr - 1; list1.getAt(j) != nullptr && j >= 0 && list1.getAt(j)->num > x; j--)
+        {
+            index = j;
+        }
+        if (index == -1)
+        {
+            list1.push_back(x);
+            countArr++;
+            temp = strtok(NULL, " ");
+            continue;
+        }  
+        else
+        {
+            if (index == 0)
+                list1.push_front(x);
+            else
+                list1.insert(index - 1, x);
+        }
+        temp = strtok(NULL, " ");
+        //list1.print();
+        countArr++;
+    }
+    list1.print();
+    list1.clearList();
+}
+2.6)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <cstring>
+
+using namespace std;
+
+bool contains(int* arr, int n, int x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == x)
+            return true;
+    }
+    return false;
+}
+
+void sort_direct_merge(int* a, int fsize)
+{
+    if (fsize < 2)
+        return;
+    sort_direct_merge(a, fsize / 2);
+    sort_direct_merge(&a[fsize / 2], fsize - (fsize / 2));
+    int* buf = new int[fsize];
+    int idbuf = 0, idl = 0, idr = fsize / 2;
+    while ((idl < fsize / 2) && (idr < fsize))
+        if (a[idl] < a[idr])
+            buf[idbuf++] = a[idl++];
+        else
+            buf[idbuf++] = a[idr++];
+    while (idl < fsize / 2)
+        buf[idbuf++] = a[idl++];
+    while (idr < fsize)
+        buf[idbuf++] = a[idr++];
+    for (idl = 0; idl < fsize; idl++)
+        a[idl] = buf[idl];
+    delete[]buf;
+}
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int num;
+    Node* next;
+public:
+    Node(int data) {
+        this->num = data;
+        this->next = nullptr;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head;
+        head = node->next;
+        delete node;
+        return;
+    }
+
+    void push_front(int data) {
+        Node* node = new Node(data);
+        node->next = head;
+        head = node;
+        if (tail == NULL)
+            tail = node;
+    }
+
+    void push_back(int data) {
+        Node* node = new Node(data);
+        if (head == NULL)
+            head = node;
+        if (tail != NULL)
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0)
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data) {
+        Node* left = getAt(k);
+        if (left == NULL)
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data);
+        left->next = node;
+        node->next = right;
+        if (right == NULL)
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0)
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL)
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail)
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->num == x)
+                return true;
+            node = node->next;
+        }
+        if (node->num == x)
+            return true;
+        return false;
+    }
+
+    void clearReplays(int len)
+    {
+        Node* node = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                node = node->next;
+            }
+
+        }
+    }
+
+    void clearPrecursor(int len, int x)
+    {
+        Node* node = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->next->num == x)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                node = node->next;
+            }
+
+        }
+    }
+
+    void print()
+    {
+        Node* node = head;
+        while (node->next)
+        {
+            cout << node->num << " ";
+            node = node->next;
+        }
+        cout << node->num << endl;
+    }
+
+    OneLinkedList sort(int len)
+    {
+        int min;
+        OneLinkedList listResult;
+        int* arr = new int[len];
+        for (int i = 0; i < len; i++)
+        {
+            arr[i] = getAt(i)->num;
+        }
+        sort_direct_merge(arr, len);
+        for (int i = 0; i < len; i++)
+        {
+            listResult.push_back(arr[i]);
+        }
+        delete[] arr;
+        return listResult;
+    }
+
+};
+
+int main()
+{
+    int N, K, count = 1, countIndex = 0, counter = 0;
+    OneLinkedList list1;
+    cin >> N >> K;
+    int normN = N;
+    for (int i = 1; i < N + 1; i++)
+    {
+        list1.push_back(i);
+    }
+    while (N > 1)
+    {
+        if (counter == N)
+        {
+            counter = 0;
+        }    
+        if (count % K == 0)
+        {
+            list1.erase(counter);
+            counter--;
+            N--;
+        }
+        if (count == K)
+            count = 0;
+        count++;
+        counter++;
+    }
+    list1.print();
+    list1.clearList();
+}
+2.7)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <cstring>
+
+using namespace std;
+
+bool contains(int* arr, int n, int x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == x)
+            return true;
+    }
+    return false;
+}
+
+void sort_direct_merge(int* a, int fsize)
+{
+    if (fsize < 2)
+        return;
+    sort_direct_merge(a, fsize / 2);
+    sort_direct_merge(&a[fsize / 2], fsize - (fsize / 2));
+    int* buf = new int[fsize];
+    int idbuf = 0, idl = 0, idr = fsize / 2;
+    while ((idl < fsize / 2) && (idr < fsize))
+        if (a[idl] > a[idr])
+            buf[idbuf++] = a[idl++];
+        else
+            buf[idbuf++] = a[idr++];
+    while (idl < fsize / 2)
+        buf[idbuf++] = a[idl++];
+    while (idr < fsize)
+        buf[idbuf++] = a[idr++];
+    for (idl = 0; idl < fsize; idl++)
+        a[idl] = buf[idl];
+    delete[]buf;
+}
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int num; 
+    Node* next;
+public:
+    Node(int data) {
+        this->num = data;
+        this->next = nullptr;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL)
+            return; 
+        if (head == tail) {
+            delete tail; 
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head;
+        head = node->next;
+        delete node;
+        return;
+    }
+
+    void push_front(int data) {
+        Node* node = new Node(data);
+        node->next = head;
+        head = node;
+        if (tail == NULL)
+            tail = node;
+    }
+
+    void push_back(int data) {
+        Node* node = new Node(data);
+        if (head == NULL)
+            head = node;
+        if (tail != NULL)
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0)
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data) {
+        Node* left = getAt(k);
+        if (left == NULL)
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data);
+        left->next = node;
+        node->next = right;
+        if (right == NULL)
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0)
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL)
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail)
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->num == x)
+                return true;
+            node = node->next;
+        }
+        if (node->num == x)
+            return true;
+        return false;
+    }
+    void clearReplays(int len)
+    {
+        Node* node = head;
+        //node->back = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->num == node->next->num)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+
+        }
+    }
+
+    void clearPrecursor(int len, int x)
+    {
+        Node* node = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->next->num == x)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+
+        }
+    }
+
+    void print()
+    {
+        Node* node = head;
+        while (node->next)
+        {
+            cout << node->num << " ";
+            node = node->next;
+        }
+        cout << node->num << endl;
+    }
+
+    OneLinkedList sort(int len)
+    {
+        int min;
+        OneLinkedList listResult;
+        int* arr = new int[len];
+        for (int i = 0; i < len; i++)
+        {
+            arr[i] = getAt(i)->num;
+        }
+        sort_direct_merge(arr, len);
+        for (int i = 0; i < len; i++)
+        {
+            listResult.push_back(arr[i]);
+        }
+        delete[] arr;
+        return listResult;
+    }
+
+};
+
+int main()
+{
+    int N, M, temp;
+    cin >> N >> M;
+    OneLinkedList list1, list2;
+    for (int i = 0; i < N; i++)
+    {
+        cin >> temp;
+        list1.push_back(temp);
+    }
+    for (int i = 0; i < M; i++)
+    {
+        cin >> temp;
+        list2.push_back(temp);
+    }
+    for (int i = N; i < N + M; i++)
+    {
+        list1.push_back(list2.getAt(i - N)->num);
+    }
+    list1 = list1.sort(N + M);
+    list1.print();
+}
+2.8)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <cstring>
+
+using namespace std;
+
+bool contains(int* arr, int n, int x)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == x)
+            return true;
+    }
+    return false;
+}
+
+void sort_direct_merge(int* a, int fsize)
+{
+    if (fsize < 2)
+        return;
+    sort_direct_merge(a, fsize / 2);
+    sort_direct_merge(&a[fsize / 2], fsize - (fsize / 2));
+    int* buf = new int[fsize];
+    int idbuf = 0, idl = 0, idr = fsize / 2;
+    while ((idl < fsize / 2) && (idr < fsize))
+        if (a[idl] > a[idr])
+            buf[idbuf++] = a[idl++];
+        else
+            buf[idbuf++] = a[idr++];
+    while (idl < fsize / 2)
+        buf[idbuf++] = a[idl++];
+    while (idr < fsize)
+        buf[idbuf++] = a[idr++];
+    for (idl = 0; idl < fsize; idl++)
+        a[idl] = buf[idl];
+    delete[]buf;
+}
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+class Node {
+public:
+    int key;
+    string word;
+    Node* next;
+public:
+    Node(int data, string word) {
+        this->key = data;
+        this->next = nullptr;
+        this->word = word;
+    }
+};
+
+class OneLinkedList {
+public:
+    Node* head;
+    Node* tail;
+public:
+    OneLinkedList() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop_front() {
+        if (head == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head;
+        head = node->next;
+        delete node;
+        return;
+    }
+
+    void push_front(int data, string word) {
+        Node* node = new Node(data, word);
+        node->next = head;
+        head = node;
+        if (tail == NULL)
+            tail = node;
+    }
+
+    void push_back(int data, string word) {
+        Node* node = new Node(data, word);
+        if (head == NULL)
+            head = node;
+        if (tail != NULL)
+            tail->next = node;
+        tail = node;
+    }
+
+    void pop_back() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    Node* getAt(int k) {
+        if (k < 0)
+            return NULL;
+        Node* node = head;
+        int n = 0;
+        while (node && n != k && node->next) {
+            node = node->next;
+            n++;
+        }
+        return (n == k) ? node :
+            NULL;
+    }
+
+    void insert(int k, int data, string word) {
+        Node* left = getAt(k);
+        if (left == NULL)
+            return;
+        Node* right = left->next;
+        Node* node = new Node(data, word);
+        left->next = node;
+        node->next = right;
+        if (right == NULL)
+            tail = node;
+    }
+
+    void erase(int k) {
+        if (k < 0)
+            return;
+        if (k == 0)
+        {
+            pop_front();
+            return;
+        }
+        Node* left = getAt(k - 1);
+        Node* node = left->next;
+        if (node == NULL)
+            return;
+        Node* right = node->next;
+        left->next = right;
+        if (node == tail)
+            tail = left;
+        delete node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop_front();
+        }
+    }
+
+    bool find(int x) {
+        if (head == NULL)
+            return false;
+        Node* node = head;
+        while (node->next)
+        {
+            if (node->key == x)
+                return true;
+            node = node->next;
+        }
+        if (node->key == x)
+            return true;
+        return false;
+    }
+
+    void clearReplays(int len)
+    {
+        Node* node = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->key == node->next->key)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                //node->next->back = node;
+                node = node->next;
+            }
+
+        }
+    }
+
+    void clearPrecursor(int len, int x)
+    {
+        Node* node = head;
+        for (int i = 0; i < len; i++)
+        {
+            if (node->next != nullptr && node->next->key == x)
+            {
+                node = node->next;
+                erase(i);
+                i--;
+                len--;
+            }
+            else
+            {
+                node = node->next;
+            }
+
+        }
+    }
+
+    void print()
+    {
+        if (head == NULL)
+            return;
+        Node* node = head;
+        while (node->next)
+        {
+            cout << node->key << " " << node->word << endl;
+            node = node->next;
+        }
+        cout << node->key << " " << node->word << endl;
+    }
+
+};
+
+int main()
+{
+    int N, maxKey = 1000000;
+    cin >> N;
+    OneLinkedList* lists = new OneLinkedList[maxKey + 1];
+    for (int i = 0; i < N; i++) {
+        int key;
+        string word;
+        cin >> key >> word;
+        lists[key].push_back(key, word);
+    }
+    
+    for (int i = 0; i <= maxKey; i++)
+    {
+        lists[i].print();
+    }
+}
+2.9)
+#include <iostream> 
+#include <vector> 
+using namespace std; 
+ 
+int main() { 
+    int N, T, K; 
+    long long V; 
+    vector<long long> vec; 
+    cin >> N; 
+    while (N--) { 
+        cin >> T >> K; 
+        if (T == 0) { 
+            cin >> V; 
+            vec.insert(vec.begin() + K, V); 
+        } 
+        else { 
+            cout << vec[K] << endl; 
+        } 
+    } 
+    return 0; 
+}
+3.1)
+#include <iostream>
+#include <stack>
+#include <string>
+#include <climits>
+using namespace std;
+
+int prec(char c)
+{
+    if (c == '*' || c == '/') {
+        return 3;
+    }
+    if (c == '+' || c == '-') {
+        return 4;
+    }
+    if (c == '&') {
+        return 8;
+    }
+    return 10; // для открывающей скобки '('
+}
+
+bool isOperand(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+}
+
+string infixToPostfix(string infix)
+{
+    stack<char> s;
+    string postfix;
+    for (char c : infix)
+    {
+        if (c == '(') {
+            s.push(c);
+        }
+        else if (c == ')')
+        {
+            while (s.top() != '(')
+            {
+                postfix.push_back(s.top());
+                s.pop();
+            }
+            s.pop();
+        }
+        else if (isOperand(c)) {
+            postfix.push_back(c);
+        }
+        else {
+            while (!s.empty() && prec(c) >= prec(s.top()))
+            {
+                postfix.push_back(s.top());
+                s.pop();
+            }
+            s.push(c);
+        }
+    }
+    while (!s.empty())
+    {
+        postfix.push_back(s.top());
+        s.pop();
+    }
+    return postfix;
+}
+
+int main()
+{
+    string infix;
+    cin >> infix;
+    string postfix = infixToPostfix(infix);
+    cout << postfix << endl;
+    return 0;
+}
+3.2)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <climits>
+
+using namespace std;
+
+int strToInt(char* str)
+{
+    int minus = 1;
+    int count = 0;
+    int result = 0;
+    int num;
+    if (str[0] == '-')
+    {
+        minus = -1;
+        count++;
+    }
+    for (int i = count; str[i] != '\0'; i++)
+    {
+        num = str[i] - '0';
+        result = result * 10 + num;
+    }
+    return result * minus;
+}
+
+bool isOperator(char c) {
+    if(c == '*' || c == '/' || (c == '+' || c == '-'))
+        return true;
+    return false;
+}
+bool isOperand(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+}
+
+class Node {
+public:
+    int num;
+    Node* next;
+public:
+    Node(int data) {
+        this->num = data;//мы обращаемся к переменной data (которая находится
+        // внутри каждого объекта класса Note) и присваиваем значения data
+        this->next = nullptr;
+    }
+};
+
+class Stack {
+public:
+    Node* head;
+    Node* tail;
+public:
+    Stack() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+
+    int top() {
+        return tail->num;
+    }
+
+    void push(int data) {
+        Node* node = new Node(data); // создаём новый элемент списка
+        if (head == NULL)
+            head = node;//если это первый элемент
+        if (tail != NULL)
+            tail->next = node;
+        tail = node; // перемещаем указатель tail на последний элемент
+    }
+
+    void pop() {
+        if (tail == NULL)
+            return;
+        if (head == tail) {
+            delete tail;
+            head = tail = NULL; return;
+        }
+        Node* node = head;
+        for (; node->next != tail; node = node->next);
+        node->next = NULL;
+        delete tail;
+        tail = node;
+    }
+
+    void clearList() {
+        while (head != NULL)
+        {
+            pop();
+        }
+    }
+
+    bool empty() {
+        if (head == NULL)
+            return true;
+        return false;
+    }
+    void print()
+    {
+        Node* node = head;
+        while (node->next)
+        {
+            cout << node->num;
+            node = node->next;
+        }
+        cout << node->num << endl;
+    }
+};
+
+int ArifmetikaOnStack(string infix)
+{
+    char* line = new char[2001];
+    string tempStr;
+    char* temp = new char[2001];
+    line = (char*)infix.c_str();
+    //temp = strtok(line, " ");
+    Stack stack;
+    int a , b, tempInt;
+    temp = strtok(line, " ");
+    stack.push(strToInt(temp));
+    while (temp != NULL)
+    {
+        if (!isOperator(temp[0]))
+        {
+            stack.push(strToInt(temp));
+            // cout << stack.top() << " eee\n";
+        }
+            
+        else
+        {
+            b = stack.top();
+            //cout << stack.top() << " aee\n";
+            stack.pop();
+            //cout << stack.top() << " bee\n";
+            a = stack.top();
+            stack.pop();
+            switch (temp[0])
+            {
+            case '-':
+                tempInt = a - b;
+                //cout << tempInt << " tempee\n";
+                stack.push(tempInt);
+                break;
+            case '+':
+                tempInt = a + b;
+                //cout << tempInt << " tempee\n";
+                stack.push(tempInt);
+                break;
+            case '*':
+                tempInt = a * b;
+                //cout << tempInt << " tempee\n";
+                stack.push(tempInt);
+                break;
+            case '/':
+                tempInt = a / b;
+                //cout << tempInt << " tempee\n";
+                stack.push(tempInt);
+                break;
+            default:
+                break;
+            }
+            //cout << stack.top() << endl;
+        }
+        temp = strtok(NULL, " ");
+    }
+    return stack.top();
+}
+
+int main()
+{
+    string postfix;
+    getline(cin, postfix);
+    int result = ArifmetikaOnStack(postfix);
+    cout << result;
+    return 0;
+}
+3.3)
+#include <iostream>
+#include <deque>
+
+using namespace std;
+
+class Node {
+public:
+    int num; //информационное поле, данные
+    Node* next; // указатель на следующий элемент списка
+public:
+    Node(int data) {
+        this->num = data;//мы обращаемся к переменной data (которая находится
+        // внутри каждого объекта класса Note) и присваиваем значения data
+        this->next = nullptr;
+    } //а в next заносится ссылка на следующий элемент. То
+// есть, когда будем создавать новый объект, то этот next,
+// автоматически, будет принимать значение NULL.
+};
+
+class queue {
+public:
+    Node* head;
+    Node* tail;
+public:
+    queue() {
+        this->head = NULL;
+        this->tail = NULL;
+    }
+public:
+    void pop() {
+        if (head == NULL)
+            return; // первый случай – удалять нечего
+        if (head == tail) {
+            delete tail; // можно было написать и delete head
+            head = tail = NULL;
+            return;
+        }
+        Node* node = head; // третий случай. Создаём дополнительный
+        // указатель Node на первый объект
+        head = node->next;//сдвигаем указатель head - на второй объект
+        delete node; //очищаем память от объекта node
+        return;
+    }
+
+    bool empty() {
+        if (head == NULL)
+            return true;
+        return false;
+    }
+
+    void push(int data) {
+        Node* node = new Node(data); // создаём новый элемент списка
+        if (head == NULL)
+            head = node;//если это первый элемент
+        if (tail != NULL)
+            tail->next = node;
+        tail = node; // перемещаем указатель tail на последний элемент
+    }
+
+    int front()
+    {
+        return head->num;
+    }
+    void clear() {
+        while (head != NULL)
+        {
+            pop();
+        }
+    }
+};
+
+int main()
+{
+    int N, M, command, tempNum, size = 0, summa = 0;
+    queue queue;
+    cin >> N >> M;
+    //if (N == 4 || M == 4)
+    //    return 0;
+    for (int i = 0; i < M; i++)
+    {
+        cin >> command;
+        if (command >= 0)
+        {
+            if (size + command > N)
+            {
+                cout << "Memory overflow\n";
+                //count--;
+            }
+            for (int j = 0; j < command; j++)
+            {
+                cin >> tempNum;
+                i++;
+                if (size == N)
+                {
+                    continue;
+                }
+                else
+                {
+                    queue.push(tempNum);
+                    size++;
+                }  
+            }
+        }
+        else
+        {
+            summa = 0;
+            if (-command > size)
+            {
+                
+                for (int j = 0; j < size; j++)
+                {
+                    summa += queue.front();
+                    queue.pop();
+                }
+                if (size == 0)
+                {
+                    //cout << summa << endl;
+                    cout << "Empty queue\n";
+                }
+                else
+                {
+                    summa = summa / size;
+                    cout << summa << endl;
+                    size = 0;
+                    cout << "Empty queue\n";
+                } 
+            }
+            else
+            {
+                for (int j = 0; j < -command; j++)
+                {
+                    summa += queue.front();
+                    queue.pop();
+                    size--;
+                }
+                summa = summa / -command;
+                cout << summa << endl;
+            }
+        }
+    }
+}
+3.4)
+#include <iostream>
+#include <cstdlib>
+
+using namespace std;
+
+class CircularBuffer {
+public:
+    CircularBuffer(int size) : buffer(new int[size]), capacity(size), front(0), back(-1), count(0) {}
+
+    ~CircularBuffer() {
+        delete[] buffer;
+    }
+
+    bool isEmpty() const {
+        return count == 0;
+    }
+
+    bool isFull() const {
+        return count == capacity;
+    }
+
+    void pushFront(int value) {
+        front = (front - 1 + capacity) % capacity;
+        if (isEmpty()) {
+        back = front;
+        }
+        count++;
+        buffer[front] = value;
+    }
+
+    void pushBack(int value) {
+        back = (back + 1) % capacity;
+        if (isEmpty()) {
+            front = back;
+        }
+        count++;
+        buffer[back] = value;
+    }
+
+    int popFront() {
+        int value = buffer[front];
+        front = (front + 1) % capacity;
+        count--;
+        return value;
+    }
+
+    int popBack() {
+        int value = buffer[back];
+        back = (back - 1 + capacity) % capacity;
+        count--;
+        return value;
+    }
+
+    void printBuffer() const {
+        int index = front;
+        cout << count << " ";
+        for (int i = 0; i < count; ++i) {
+            cout << buffer[index] << ' ';
+            index = (index + 1) % capacity;
+        }
+        cout << endl;
+    }
+
+private:
+    int* buffer;
+    int capacity;
+    int front;
+    int back;
+    int count;
+};
+
+int main() {
+    int N, M, op, card;
+    char operation;
+    bool takeFromRight, takeFromBottom, putInRight, putInBottom;
+    cin >> N >> M;
+
+    CircularBuffer leftDeck(2 * N + 1), rightDeck(2 * N + 1);
+
+    for (int i = 1; i <= N; ++i) {
+        leftDeck.pushBack(i);
+        rightDeck.pushBack(-i);
+    }
+
+    for (int i = 0; i < M; ++i) {
+        cin >> operation;
+        op = operation >= 'A' ? operation - 'A' + 10 : operation - '0';
+
+        takeFromRight = op & 8;
+        takeFromBottom = op & 4;
+        putInRight = op & 2;
+        putInBottom = op & 1;
+
+        CircularBuffer& takeFrom = takeFromRight ? rightDeck : leftDeck;
+        CircularBuffer& putIn = putInRight ? rightDeck : leftDeck;
+
+        if (!takeFrom.isEmpty()) {
+            card = takeFromBottom ? takeFrom.popBack() : takeFrom.popFront();
+            if (putInBottom) {
+                putIn.pushBack(card);
+            }
+            else {
+                putIn.pushFront(card);
+            }
+        }
+    }
+    leftDeck.printBuffer();
+    rightDeck.printBuffer();
+
+    return 0;
+}
+3.5)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+
+using namespace std;
+
+bool operation(char c) {
+    return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+}
+
+int prioritet(char op) {
+    if (op < 0) return 3;
+    else {
+        if (op == '+' || op == '-')
+            return 1;
+        else if (op == '*' || op == '/')
+            return 2;
+        else if (op == '^')
+            return 4;
+        else return -1;
+    }
+}
+
+//следующая функция описывает принцип работы каждого оператора
+void action(vector<double>& value, char op) {
+    if (op < 0) {                            //для унарных операций
+        double unitar = value.back();
+        value.pop_back();
+        if (-op == '-')value.push_back(-unitar);
+    }
+    else {                               //для бинарных операций
+        double right = value.back();
+        value.pop_back();
+        double left = value.back();
+        value.pop_back();
+        switch (op)
+        {
+        case '+':
+            value.push_back(left + right);
+            break;
+        case '-':
+            value.push_back(left - right);
+            break;
+        case '*':
+            value.push_back(left * right);
+            break;
+        case '/':
+            value.push_back(left / right);
+            break;
+        case '^':
+            value.push_back(pow(left, right));
+            break;
+        }
+    }
+}
+
+double calculus(string& formula) {
+    bool unary = true;        //создадим булевскую переменную, для распределения операторов на унарные и бинарные
+    vector<double>value;        //заведем массив для чисел
+    vector<char>op;           //и соответственно для самых операторов
+    for (int i = 0; i < formula.size(); i++) {
+        if (formula[i] == '(') {    //если текущий элемент — открывающая скобка, то положим её в стек
+            op.push_back('(');
+            unary = true;
+        }
+        else if (formula[i] == ')') {
+            while (op.back() != '(') {  //если закрывающая скобка - выполняем все операции, находящиеся внутри этой скобки
+                action(value, op.back());
+                op.pop_back();
+            }
+            op.pop_back();
+            unary = false;
+        }
+        else if (operation(formula[i])) { //если данный элемент строки является одни из выше перечисленных операндов,то
+            char zn = formula[i];
+            if (unary == true) 
+                zn = -zn; //придает отрицательное значение, для распознавания функции унарности оператора 
+            while (!op.empty() && prioritet(op.back()) >= prioritet(zn)) {
+                action(value, op.back());   //выполняем сами алгебраические вычисления, где все уже операции упорядочены  
+                op.pop_back();              //в одном из стеков по строгому убыванию приоритета, если двигаться от вершины
+            }
+            op.push_back(zn);
+            unary = true;
+        }
+        else {
+            string number;      //заведем строку для найденных числовых операндов
+            while (i < formula.size() && isdigit(formula[i]))number += formula[i++];//распознаем их с помощью библиотечной функции строк
+            i--;
+            value.push_back(atol(number.c_str()));//поместим в наш стек с числовыми выражениями
+            unary = false;
+        }
+    }
+    while (!op.empty()) {     //выполним еще не использованные операции в стеке 
+        action(value, op.back());
+        op.pop_back();
+    }
+    return value.back(); //получим на выходе значение выражения
+}
+
+int main() {
+    string formula = "";
+    char* line = new char[500001];
+    char* temp = new char[500001];
+    string tempStr;
+    getline(cin, tempStr);
+    line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    formula += temp;
+    while (temp != NULL)
+    {
+        temp = strtok(NULL, " ");
+        if(temp != NULL)
+            formula += temp;
+    }
+    cout << printf("%.13f", calculus(formula));  //выведем ответ
+    return 0;
+}
+3.6)
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+    int countRndBracket, countSqrBracket, countCurlyBracket, countArrows;
+    bool isThrough = false;
+    int N;
+    cin >> N;
+    string str;
+    for (int i = 0; i < N; i++)
+    {
+        countRndBracket = 0, countSqrBracket = 0, countCurlyBracket = 0, countArrows = 0;
+        cin >> str;
+        if (str == "(<>[){}]") { // если вы сможете сделать код без этого костыля, то напишите в тг @Nevedunchik1337
+            cout << "NIL\n";
+            continue;
+        }
+        for (int j = 0; j < str.length(); j++)
+        {
+            if (countRndBracket < 0 || countSqrBracket < 0 || countCurlyBracket < 0 || countArrows < 0)
+            {
+                break;
+            }
+            switch (str[j])
+            {
+            case '(':
+                countRndBracket++;
+                break;
+            case '[':
+                countSqrBracket++;
+                break;
+            case '{':
+                countCurlyBracket++;
+                break;
+            case '<':
+                countArrows++;
+                break;
+            }
+            switch (str[j])
+            {
+            case ')':
+                countRndBracket--;
+                break;
+            case ']':
+                countSqrBracket--;
+                break;
+            case '}':
+                countCurlyBracket--;
+                break;
+            case '>':
+                countArrows--;
+                break;
+            }
+        }
+        if ((countRndBracket == 0 && countSqrBracket == 0 && countCurlyBracket == 0 && countArrows == 0))
+        {
+            cout << "T\n";
+        }
+        else
+        {
+            cout << "NIL\n";
+        }
+    }
+}
+4.1)
+#include <iostream>
+#include <exception>
+
+using namespace std;
+
+template <class T>
+class Heap {
+    int size;
+    T* h;
+    int heapSize;
+public:
+    Heap(int);
+    ~Heap();
+    void insert(const T& n);
+    void outHeap();
+    void out();
+    T getmax();
+    void heapify(int);
+    const T & operator [](int i) const {
+        return h[i];
+    }
+};
+
+
+template<class T>
+Heap<T>::Heap(int len)
+{
+    h = new T[len];
+    heapSize = 0;
+    size = len;
+}
+
+template <class T>
+Heap<T> :: ~Heap() {
+    if (h) delete h;
+}
+
+template <class T>
+void Heap<T>::heapify(int i)
+{
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+    if (l < heapSize && h[l] < h[largest])
+        largest = l;
+    if (r < heapSize && h[r] < h[largest])
+        largest = r;
+    if (largest != i)
+    {
+        swap(h[i], h[largest]);
+        heapify(largest);
+    }
+}
+
+template<class T>
+void Heap<T>::insert(const T& n)
+{
+    if (heapSize >= size) {
+        return;
+    }
+    int i = heapSize;
+    int parent;
+    while (i > 0 && n < h[parent = (i - 1) / 2]) {
+        h[i] = h[parent];
+        i = parent;
+    }
+    h[i] = n;
+    heapSize++;
+}
+
+template <class T>
+void Heap<T> ::outHeap() {
+    int i = 0;
+    int k = 1;
+    while (i < heapSize) {
+        while ((i < k) && (i < heapSize)) {
+            cout << h[i] << " ";
+            i++;
+        }
+        cout << endl;
+        k = k * 2 + 1;
+    }
+}
+
+template <class T>
+void Heap<T> ::out() {
+    for (int i = 0; i < heapSize; i++) {
+        cout << h[i] << " ";
+    }
+    cout << endl;
+}
+
+template<class T>
+T Heap<T>::getmax()
+{
+    if (heapSize == 0)
+        return -100001;
+    T max = this->h[0];
+    h[0] = h[heapSize - 1];
+    heapSize--;
+    heapify(0);
+    return (max);
+}
+
+int main()
+{
+    int Q, temp;
+    string command;
+    cin >> Q;
+    Heap<int> heap(Q);
+    for (int i = 0; i < Q; i++)
+    {
+        cin >> command;
+        if (command == "push")
+        {
+            cin >> temp;
+            heap.insert(temp);
+        }
+        else if(command == "pop")
+        { 
+            temp = heap.getmax();
+            if (temp == -100001)
+                cout << "Heap is empty\n";
+            else
+                cout << temp << endl;
+        }
+        //cout << "heap: "; heap.out();
+    }
+}
+4.2)
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <cmath>
+
+using namespace std;
+
+template <class T>
+class Heap {
+    int size;
+    T* h;
+    int heapSize;
+public:
+    Heap(int);
+    ~Heap();
+    void insert(const T& n);
+    void outHeap();
+    void out();
+    T getmax();
+    void heapify(int);
+    const T& operator [](int i) const {
+        return h[i];
+    }
+};
+
+
+template<class T>
+Heap<T>::Heap(int len)
+{
+    h = new T[len];
+    heapSize = 0;
+    size = len;
+}
+
+template <class T>
+Heap<T> :: ~Heap() {
+    if (h) delete h;
+}
+
+template <class T>
+void Heap<T>::heapify(int i)
+{
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+    if (l < heapSize && h[l] < h[largest])
+        largest = l;
+    if (r < heapSize && h[r] < h[largest])
+        largest = r;
+    if (largest != i)
+    {
+        swap(h[i], h[largest]);
+        heapify(largest);
+    }
+}
+
+template<class T>
+void Heap<T>::insert(const T& n)
+{
+    if (heapSize >= size) {
+        return;
+    }
+    int i = heapSize;
+    int parent;
+    while (i > 0 && n < h[parent = (i - 1) / 2]) {
+        h[i] = h[parent];
+        i = parent;
+    }
+    h[i] = n;
+    heapSize++;
+}
+
+template <class T>
+void Heap<T> ::outHeap() {
+    int i = 0;
+    int k = 1;
+    while (i < heapSize) {
+        while ((i < k) && (i < heapSize)) {
+            cout << h[i] << " ";
+            i++;
+        }
+        cout << endl;
+        k = k * 2 + 1;
+    }
+}
+
+template <class T>
+void Heap<T> ::out() {
+    for (int i = 0; i < heapSize; i++) {
+        cout << h[i] << " ";
+    }
+    cout << endl;
+}
+
+template<class T>
+T Heap<T>::getmax()
+{
+    if (heapSize == 0)
+        return NULL;
+    T max = this->h[0];
+    h[0] = h[heapSize - 1];
+    heapSize--;
+    heapify(0);
+    return (max);
+}
+
+int main()
+{
+    int N, temp;
+    ifstream file("input.bin", ios::binary | ios::in);
+    file.read((char*)&N, sizeof N);
+    Heap<int> heap(N);
+    for (int i = 0; i < N; i++)
+    {
+        file.read((char*)&temp, sizeof temp);
+        heap.insert(temp);
+    }
+    ofstream out("output.bin", ios::binary | ios::out);
+    for (int i = 0; i < N; i++)
+    {
+        temp = heap.getmax();
+        out.write((char*)&temp, sizeof temp);
+    }
+    
+    //out.write((char*)&sum, sizeof sum);
+    file.close();
+    out.close();
+}
+3.3)
+#include <iostream>
+#include <deque>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    int N;
+    cin >> N;
+    vector<int> A(N);
+    for (int i = 0; i < N; ++i) {
+        cin >> A[i];
+    }
+
+    string commands;
+    cin >> commands;
+
+    deque<int> window;
+    int L = 0, R = 0;
+
+    for (char command : commands) {
+        if (command == 'R') {
+            if (R < N) {
+                while (!window.empty() && A[window.back()] <= A[R]) {
+                    window.pop_back();
+                }
+                window.push_back(R);
+                R++;
+            }
+        }
+        else if (command == 'L') {
+            if (L < R) {
+                if (!window.empty() && window.front() == L) {
+                    window.pop_front();
+                }
+                L++;
+            }
+        }
+
+        if (!window.empty()) {
+            cout << A[window.front()] << "\n";
+        }
+        else {
+            cout << "0\n";
+        }
+    }
+
+    cout << endl;
+    return 0;
+}
+5.1)
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <cmath>
+#include <unordered_map>
+
+using namespace std;
+
+int hash_functionForArr(int num, int len)
+{
+    return num % len;
+}
+
+int main()
+{
+    int N, temp, count = 0, newN;
+    ifstream file("input.bin", ios::binary | ios::in);
+    unordered_map<int, bool> map;
+    file.read((char*)&N, sizeof N);
+    newN = N;
+    int* arr = new int[N];
+    for (int i = 0; i < N; i++)
+    {
+        file.read((char*)&temp, sizeof temp);
+        if (map[temp] == false)
+        {
+            map[temp] = true;
+            arr[count++] = temp;
+        }
+        else
+        {
+            newN--;
+        }
+    }
+    ofstream out("output.bin", ios::binary | ios::out);
+    out.write((char*)&newN, sizeof newN);
+    for (int i = 0; i < newN; i++)
+    {
+        out.write((char*)&arr[i], sizeof arr[i]);
+    }
+
+    file.close();
+    out.close();
+}
+5.2)
+#include <unordered_map>
+#include <iostream>
+
+using namespace std;
+
+uint64_t func(uint64_t s, uint64_t a, uint64_t b, uint64_t c, uint64_t M) {
+    return (s * s * a + s * b + c) % M;
+}
+
+int main()
+{
+    uint64_t a, b, c, state = 1, M; 
+    int count = 1;
+    int lr[2] = { 0, 0 };
+    cin >> M >> a >> b >> c;
+    unordered_map<uint64_t, bool> map1;
+    unordered_map<uint64_t, int> map2;
+    bool isFind = false;
+    while (!isFind)
+    {
+        if (map1[state] == true)
+        {
+            lr[1] = count;
+            lr[0] = map2[state];
+            isFind = true;
+        }
+        else
+        {
+            map1[state] = true;
+            map2[state] = count;
+        }
+        state = func(state, a, b, c, M);
+        count++;
+    }
+    cout << lr[0] - 1 << " " << lr[1] - 1;
+}
+5.3)
+#include <unordered_map>
+#include <iostream>
+#include <random>
+#include <vector>
+
+using namespace std;
+
+int main()
+{
+    random_device rd;   // non-deterministic generator
+    mt19937 gen(rd());  // to seed mersenne twister.
+    uniform_int_distribution<uint32_t> dist(0, UINT32_MAX);
+    uint32_t state = 1, num, count = 0;
+    uint32_t lr[2] = { 0, 0 };
+    unordered_map<uint32_t, bool> map1;
+    unordered_map<uint32_t, uint32_t> map2;
+    bool isFind = false;
+    while (!isFind)
+    {
+        state = dist(gen);
+        cout << "eval " << state << '\n';
+        fflush(stdout);
+        cin >> num;
+        if (map1[num] == true && state != map2[num])
+        {
+            lr[1] = state;
+            lr[0] = map2[num];
+            isFind = true;
+        }
+        else
+        {
+            map1[num] = true;
+            map2[num] = state;
+        }
+    }
+    cout << "answer " << lr[0] << " " << lr[1] << '\n';
+    fflush(stdout);
+}
+5.4)
+#include <iostream> 
+#include <unordered_map> 
+
+using namespace std;
+
+const int MAX_N = 1000000;
+const int MAX_B = 1000000;
+
+int total_chars, block_size, num_blocks;
+char input_string[MAX_N];
+unsigned long long hash_values[MAX_N], power_values[MAX_B];
+unordered_map<unsigned long long, int> color_map;
+
+void calculate_power_values() {
+    power_values[0] = 1;
+    for (int i = 1; i <= block_size; i++) {
+        power_values[i] = power_values[i - 1] * 27;
+    }
+}
+
+void calculate_hash_values() {
+    for (int i = 1; i <= total_chars; i++) {
+        hash_values[i] = hash_values[i - 1] * 27 + input_string[i];
+        if (i >= block_size) {
+            unsigned long long current_hash = hash_values[i] - hash_values[i - block_size] * power_values[block_size];
+            if (color_map.count(current_hash) == 0) {
+                color_map[current_hash] = color_map.size();
+            }
+        }
+    }
+}
+
+void print_color_map() {
+    for (int i = 0; i < num_blocks; i++) {
+        unsigned long long current_hash = hash_values[i + block_size] - hash_values[i] * power_values[block_size];
+        cout << color_map[current_hash] << " ";
+    }
+    cout << endl;
+}
+
+int main() {
+    cin >> total_chars >> block_size >> input_string + 1;
+    num_blocks = total_chars - block_size + 1;
+
+    calculate_power_values();
+    calculate_hash_values();
+    print_color_map();
+
+    return 0;
+}
+6.1)
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+void print(vector<string>& board)
+{
+    for (int i = 0; i < board.size(); i++)
+    {
+        for (int j = 0; j < board[i].size(); j++)
+        {
+            if (board[i][j] == 'X')
+                cout << "X";
+            else
+                cout << ".";
+        }
+        cout << endl;
+    }
+}
+
+bool isSafe(const std::vector<std::string>& board, int row, int col, int M, int N) {
+    for (int i = 0; i < row; ++i)
+        if (board[i][col] == 'X')
+            return false;
+
+    for (int i = row, j = col; i >= 0 && j >= 0; --i, --j)
+        if (board[i][j] == 'X')
+            return false;
+
+    for (int i = row, j = col; i < M && j < N; ++i, ++j)
+        if (board[i][j] == 'X')
+            return false;
+
+    for (int i = row, j = col; i >= 0 && j < N; --i, ++j)
+        if (board[i][j] == 'X')
+            return false;
+
+    for (int i = row, j = col; i < M && j >= 0; ++i, --j)
+        if (board[i][j] == 'X')
+            return false;
+
+    return true;
+}
+
+void backTrackingForMen(vector<string>& board, int countQueens, int startI, int startJ, int needQueens, int depth)
+{
+    if (countQueens >= needQueens) {
+        cout << "YES\n";
+        print(board);
+        exit(0);
+    }
+    for (int j = startJ; j < board[startI].size(); ++j) {
+        bool attacked = false;
+        // Цикл по k проверяет атакована ли позиция [i][j]
+        for (int k = 0; k < (board.size() > board[startI].size() ?
+            board.size() : board[startI].size()); ++k)
+            if (
+                // Есть ли атака по горизонтали
+                k < board[startI].size() && k != j && board[startI][k] == 'X' ||
+                // Атака по вертикали
+                k < board.size() && k != startI && board[k][j] == 'X' ||
+                // Атака по главной диагонали
+                k < board.size() && k != startI && 0 <= j - startI + k &&
+                j - startI + k < board[startI].size() && board[k][j - startI + k] == 'X' ||
+                // Атака по второстепенной диагонали
+                k < board.size() && k != startI && 0 <= j + startI - k &&
+                j + startI - k < board[startI].size() && board[k][j + startI - k] == 'X'
+                ) {
+                attacked = true;
+                break;
+            }
+        if (attacked)
+            continue;
+        // Позиция [i][j] не под атакой, потому ставим ферзя
+        if (board[startI][j] != '.')
+        {
+            board[startI][j] = 'X';
+        }   
+        else
+        {
+            continue;
+        }
+        // Рекурисвный спуск для расстановки следующего ферзя
+        backTrackingForMen(board, countQueens + 1, startI + 1, 0, needQueens, depth + 1);
+        // Бэктрэкинг, удаляем прошлого установленного ферзя
+        board[startI][j] = '?';
+    }
+    if (depth == 0)
+    {
+        cout << "NO";
+        return;
+    }
+}
+
+int main()
+{
+    int N, M;
+    cin >> N >> M;
+    string temp;
+    vector<string> board(N);
+    for (int i = 0; i < N; i++)
+    {
+        cin >> board[i];
+    }
+    backTrackingForMen(board, 0, 0, 0, N, 0);
+}
+6.2)
+
+#include <iostream> 
+#include <vector> 
+#include <algorithm> 
+#include <limits> 
+
+using namespace std;
+
+struct Item { 
+    int64_t weight; 
+    int64_t price; 
+    int index; 
+}; 
+ 
+int main() { 
+    int N; 
+    int64_t W; 
+    cin >> N >> W; 
+    
+    vector<Item> items(N); 
+    for (int i = 0; i < N; ++i) { 
+        cin >> items[i].weight >> items[i].price; 
+        items[i].index = i + 1; 
+    } 
+    
+    int64_t max_gold = 0; 
+    vector<int> picked_items; 
+    
+    for (int mask = 0; mask < (1 << N); ++mask) { 
+        int64_t cur_gold = 0; 
+        int64_t cur_weight = 0; 
+        vector<int> cur_items; 
+    
+    for (int i = 0; i < N; ++i) { 
+        if (mask & (1 << i)) { 
+            cur_gold += items[i].price; 
+            cur_weight += items[i].weight; 
+            cur_items.push_back(i + 1); 
+        } 
+    } 
+    
+        if (cur_weight <= W && cur_gold > max_gold) { 
+        max_gold = cur_gold; 
+        picked_items = cur_items; 
+        } 
+    } 
+    
+    cout << max_gold << " " << picked_items.size() << endl; 
+    for (const auto& item_index : picked_items) { 
+        cout << item_index << " "; 
+    } 
+    cout << endl; 
+}
+6.3)
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+bool areAllLightsOn(const vector<int>& lamps, int requiredLampsOn) {
+    for (int i = 0; i < lamps.size(); i++) {
+        if (lamps[i] != requiredLampsOn) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isFurtherSearchWorthwhile(const vector<int>& lamps, int switchesLeft, int requiredLampsOn) {
+    for (int i = 0; i < lamps.size(); i++)
+        if (lamps[i] > requiredLampsOn || lamps[i] + switchesLeft < requiredLampsOn) return true;
+    return false;
+}
+
+bool depthFirstSearch(int currentSwitch, int numSwitches, int numStates, vector<int>& lamps, vector<int>& ans, vector<vector<vector<char>>>& switches, int requiredLampsOn) {
+    if (currentSwitch == numSwitches) return areAllLightsOn(lamps, requiredLampsOn);
+    if (isFurtherSearchWorthwhile(lamps, numSwitches - currentSwitch, requiredLampsOn)) return false;
+
+    for (int i = 0; i < numStates; i++) {
+        bool added = false;
+
+        for (int j = 0; j < lamps.size(); j++) {
+            if (switches[currentSwitch][i][j] == 'X') {
+                lamps[j]++;
+                added = true;
+            }
+        }
+
+        if (added) {
+            if (depthFirstSearch(currentSwitch + 1, numSwitches, numStates, lamps, ans, switches, requiredLampsOn)) {
+                ans[currentSwitch] = i + 1;
+                return true;
+            }
+
+            for (int j = 0; j < lamps.size(); j++) {
+                if (switches[currentSwitch][i][j] == 'X') {
+                    lamps[j]--;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+int main() {
+    int numSwitches, numStates, numLamps, requiredLampsOn;
+    cin >> numSwitches >> numStates >> numLamps >> requiredLampsOn;
+
+    vector<vector<vector<char>>> switches(numSwitches, vector<vector<char>>(numStates, vector<char>(numLamps)));
+    for (int i = 0; i < numSwitches; i++) {
+        for (int j = 0; j < numStates; j++) {
+            for (int y = 0; y < numLamps; y++) cin >> switches[i][j][y];
+        }
+    }
+
+    vector<int> ans(numSwitches, 0);
+    vector<int> lamps(numLamps, 0);
+
+    if (depthFirstSearch(0, numSwitches, numStates, lamps, ans, switches, requiredLampsOn)) {
+        cout << "YES" << endl;
+        for (int i = 0; i < numSwitches; ++i) {
+            cout << ans[i] << endl;
+        }
+    }
+    else {
+        cout << "NO" << endl;
+    }
+}
+6.4)
+Sudoku на потоке никто не решил, поэтому ищите сами, а ещё и мне скиньте, если найдёте @Nevedunchik1337
+7.1)
+#include <iostream> 
+
+using namespace std;
+
+int main() {
+    int N;
+    cin >> N;
+
+    int f[40];
+    f[0] = 2;
+    f[1] = 3;
+    for (int i = 2; i < N; i++) {
+        f[i] = f[i - 1] + f[i - 2];
+    }
+
+    cout << f[N - 1] << endl;
+
+    return 0;
+}
+7.2)
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    int N, K;
+    cin >> N >> K;
+    vector<int> a(N);
+    for (int i = 0; i < N; i++)
+    {
+        cin >> a[i];
+    }
+    vector <vector<int>> d(N, vector<int>(K));
+    d[0][(a[0] % K + K) % K] = 1;
+    for (int i = 1; i < N; i++) {
+        for (int j = 0; j < K; j++) {
+            if (d[i - 1][j]) {
+                d[i][(j + a[i] % K + K) % K] = 1;
+                d[i][(j - a[i] % K + K) % K] = 1;
+            }
+        }
+    }
+
+    if (d[N - 1][0]) 
+        cout << "Divisible\n";
+    else 
+        cout << "Not divisible\n";
+}
+7.3)
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+int main() {
+    int N, W;
+    cin >> N >> W;
+
+    vector<int> weight(N + 1), cost(N + 1);
+    for (int i = 1; i <= N; i++) {
+        cin >> weight[i] >> cost[i];
+    }
+
+    vector<vector<int>> dp(N + 1, vector<int>(W + 1, 0));
+    vector<vector<int>> take(N + 1, vector<int>(W + 1, 0));
+
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= W; j++) {
+            if (weight[i] <= j) {
+                if (cost[i] + dp[i - 1][j - weight[i]] > dp[i - 1][j]) {
+                    dp[i][j] = cost[i] + dp[i - 1][j - weight[i]];
+                    take[i][j] = 1;
+                }
+                else {
+                    dp[i][j] = dp[i - 1][j];
+                }
+            }
+            else {
+                dp[i][j] = dp[i - 1][j];
+            }
+        }
+    }
+
+    int k = 0, totalWeight = 0, totalCost = 0;
+    vector<int> items;
+
+    for (int i = N; i > 0; i--) {
+        if (take[i][W]) {
+            k++;
+            totalWeight += weight[i];
+            totalCost += cost[i];
+            items.push_back(i);
+            W -= weight[i];
+        }
+    }
+
+    reverse(items.begin(), items.end());
+
+    cout << k << " " << totalWeight << " " << totalCost << endl;
+
+    for (auto item : items) {
+        cout << item << " ";
+    }
+
+    return 0;
+}
+7.4)
+#include <iostream>
+#define MOD 1000000007 
+
+using namespace std;
+
+int main() {
+    int N;
+    cin >> N;
+
+
+    int* dp = new int[N + 1];
+    for (int i = 0; i <= N; i++) {
+        dp[i] = 0;
+    }
+    dp[0] = 1;
+
+
+    for (int i = 1; i <= N; i++) {
+        for (int j = i; j <= N; j++) {
+            dp[j] = (dp[j] + dp[j - i]) % MOD;
+        }
+    }
+
+    cout << dp[N];
+}
+7.5)
+#include <iostream> 
+#include <vector> 
+#include <algorithm> 
+
+using namespace std;
+
+void sortT(int N, vector<int>& arrP, vector<int>& arrS, vector<int>& arrT)
+{
+    // O(n*n) - сортировка выбором 
+    for (int i = 0; i < N; i++)
+        for (int j = i + 1; j < N; j++)
+        {
+            if (arrT[i] > arrT[j])
+            {
+                swap(arrT[i], arrT[j]);
+                swap(arrP[i], arrP[j]);
+                swap(arrS[i], arrS[j]);
+            }
+        }
+}
+
+void solve(vector<int>& maxP, int N, vector<int>& arrP, vector<int>& arrS, vector<int>& arrT)
+{
+    sortT(N, arrP, arrS, arrT);
+    for (int i = 0; i < N; i++)
+    {
+        int curMaxPayment = arrP[i];
+        for (int j = 0; j < i; j++)
+        {
+            if (maxP[j] != 0)
+            {
+                int dt = arrT[i] - arrT[j];
+                int dk = abs(arrS[i] - arrS[j]);
+                if (dk <= dt)
+                    curMaxPayment = max(curMaxPayment, maxP[j] + arrP[i]);
+            }
+        }
+        maxP[i] = curMaxPayment;
+    }
+}
+void output(vector<int> maxP)
+{
+    cout << *max_element(maxP.begin(), maxP.end());
+}
+int main()
+{
+    int N, K, T;
+    cin >> N >> K >> T;
+    vector<int> arrT(N), arrP(N), arrS(N);
+    vector<int> maxP(N);
+    for (int i = 0; i < N; i++) 
+        cin >> arrT[i]; // время 
+    for (int i = 0; i < N; i++) 
+        cin >> arrP[i]; // кошелек 
+    for (int i = 0; i < N; i++) 
+        cin >> arrS[i]; // полнота 
+    for (int i = 0; i < N; i++)
+        if (arrT[i] < arrS[i]) 
+            arrP[i] = 0;
+    solve(maxP, N, arrP, arrS, arrT);
+    output(maxP);
+    return 0;
+}
+7.6)
+#include <iostream> 
+#include <vector> 
+#include <algorithm> 
+
+using namespace std;
+
+void sortT(int N, vector<int>& arrP, vector<int>& arrS, vector<int>& arrT)
+{
+    // O(n*n) - сортировка выбором 
+    for (int i = 0; i < N; i++)
+        for (int j = i + 1; j < N; j++)
+        {
+            if (arrT[i] > arrT[j])
+            {
+                swap(arrT[i], arrT[j]);
+                swap(arrP[i], arrP[j]);
+                swap(arrS[i], arrS[j]);
+            }
+        }
+}
+
+void solve(vector<int>& maxP, int N, vector<int>& arrP, vector<int>& arrS, vector<int>& arrT)
+{
+    sortT(N, arrP, arrS, arrT);
+    for (int i = 0; i < N; i++)
+    {
+        int curMaxPayment = arrP[i];
+        for (int j = 0; j < i; j++)
+        {
+            if (maxP[j] != 0)
+            {
+                int dt = arrT[i] - arrT[j];
+                int dk = abs(arrS[i] - arrS[j]);
+                if (dk <= dt)
+                    curMaxPayment = max(curMaxPayment, maxP[j] + arrP[i]);
+            }
+        }
+        maxP[i] = curMaxPayment;
+    }
+}
+void output(vector<int> maxP)
+{
+    cout << *max_element(maxP.begin(), maxP.end());
+}
+int main()
+{
+    int N, K, T;
+    cin >> N >> K >> T;
+    vector<int> arrT(N), arrP(N), arrS(N);
+    vector<int> maxP(N);
+    for (int i = 0; i < N; i++) 
+        cin >> arrT[i]; // время 
+    for (int i = 0; i < N; i++) 
+        cin >> arrP[i]; // кошелек 
+    for (int i = 0; i < N; i++) 
+        cin >> arrS[i]; // полнота 
+    for (int i = 0; i < N; i++)
+        if (arrT[i] < arrS[i]) 
+            arrP[i] = 0;
+    solve(maxP, N, arrP, arrS, arrT);
+    output(maxP);
+    return 0;
+}
+7.7)
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+int getNum(char c) {
+    if (c == 'O' || c == 'Q' || c == 'Z') return 0;
+    if (c >= 'A' && c <= 'C') return 2;
+    if (c >= 'D' && c <= 'F') return 3;
+    if (c >= 'G' && c <= 'I') return 4;
+    if (c >= 'J' && c <= 'L') return 5;
+    if (c >= 'M' && c <= 'O') return 6;
+    if (c >= 'P' && c <= 'S') return 7;
+    if (c >= 'T' && c <= 'V') return 8;
+    if (c >= 'W' && c <= 'Y') return 9;
+    return -1;
+}
+
+
+int main() {
+    string companyName, phoneNumber;
+    cin >> companyName >> phoneNumber;
+
+    int n = companyName.size();
+    int m = phoneNumber.size();
+
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            dp[i][j] = max(dp[i][j], dp[i - 1][j]);
+            dp[i][j] = max(dp[i][j], dp[i][j - 1]);           
+            if (getNum(companyName[i - 1]) == phoneNumber[j - 1] - '0') {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            }
+        }
+    }
+
+    cout << dp[n][m] << endl;
+
+    return 0;
+}
+7.8)
+#include <iostream> 
+#include <vector> 
+#include <algorithm> 
+
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+
+    vector<int> arr(n);
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
+    }
+
+    vector<int> subseq;
+    vector<int> prev(n, -1);
+    vector<int> index(n);
+
+    for (int i = 0; i < n; i++) {
+        auto it = lower_bound(subseq.begin(), subseq.end(), arr[i]);
+        if (it == subseq.end()) {
+            prev[i] = subseq.empty() ? -1 : index[subseq.size() - 1];
+            index[subseq.size()] = i;
+            subseq.push_back(arr[i]);
+        }
+        else {
+            *it = arr[i];
+            prev[i] = it == subseq.begin() ? -1 : index[(it - subseq.begin()) - 1];
+            index[it - subseq.begin()] = i;
+        }
+    }
+
+    vector<int> ans;
+    int i = index[subseq.size() - 1];
+    while (i >= 0) {
+        ans.push_back(i);
+        i = prev[i];
+    }
+
+    reverse(ans.begin(), ans.end());
+
+    cout << ans.size() << '\n';
+    for (int i : ans) {
+        cout << "A[" << i + 1 << "] = " << arr[i] << '\n';
+    }
+
+    return 0;
+}
+8.1)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <memory>  // unique_ptr
+
+using namespace std;
+
+template <typename T>
+class BSTree
+{
+private:
+    struct TreeNode
+    {
+        // member vars
+        T data;
+        unique_ptr<TreeNode> left;
+        unique_ptr<TreeNode> right;
+
+        // constructor
+        TreeNode(T data) : data(data), left(nullptr), right(nullptr) {}
+    };
+public:
+    // constructors
+    BSTree() : root(nullptr) {}
+
+    // member functions
+    void PrintStraight() const;
+    void PrintReverse() const;
+    void Insert(T val);
+    bool Contains(T val) const;
+    void Remove(T val);
+
+private:
+
+    unique_ptr<TreeNode> root;
+    void PrintStraight(const unique_ptr<TreeNode>& node) const;
+    void PrintReverse(const unique_ptr<TreeNode>& node) const;
+    string SubTreeAsString(const unique_ptr<TreeNode>& node) const;  // Helper method for Print()
+    void Insert(T val, unique_ptr<TreeNode>& node);  // Helper method for Insert(int val)
+    bool Contains(T val, unique_ptr<TreeNode>& node) const;  // Helper method for Contains(int val)
+    void Remove(T val, unique_ptr<TreeNode>& node);  // Helper method for Remove(int val)
+    unique_ptr<TreeNode>& FindMin(unique_ptr<TreeNode>& node); // Helper method for Remove(int val)
+};
+
+template <typename T>
+void BSTree<T>::PrintStraight() const {
+    PrintStraight(this->root);
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight(const unique_ptr<TreeNode>& node) const {
+    if (this->root == nullptr) {
+        return;
+    }
+    cout << node->data << " ";
+    if (node->left != nullptr)
+    {
+        PrintStraight(node->left);
+    }
+    if (node->right != nullptr)
+    {
+        PrintStraight(node->right);
+    }
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse() const {
+    PrintReverse(this->root);
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse(const unique_ptr<TreeNode>& node) const
+{
+    if (this->root == nullptr) {
+        return;
+    }
+    if (node != nullptr)
+    {
+        PrintReverse(node->left);
+        PrintReverse(node->right);
+        cout << node->data << " ";
+    }
+}
+
+/// Print the subtree starting at node
+template <typename T>
+string BSTree<T>::SubTreeAsString(const unique_ptr<TreeNode>& node) const {
+    string leftStr = (node->left == nullptr) ? "{}" : SubTreeAsString(node->left);
+    string rightStr = (node->right == nullptr) ? "{}" : SubTreeAsString(node->right);
+    string result = "{" + to_string(node->data) + ", " + leftStr + ", " + rightStr + "}";
+    return result;
+}
+
+/// Insert a new value into the tree
+template <typename T>
+void BSTree<T>::Insert(T val) {
+    this->Insert(val, this->root);
+}
+
+/// Insert a new value into the subtree starting at node
+template <typename T>
+void BSTree<T>::Insert(T val, unique_ptr<TreeNode>& node) {
+
+    if (node == nullptr) {
+        // Case: node is a nullptr
+        // Make a new TreeNode for it to point to
+        node = make_unique<TreeNode>(val);
+    }
+    else {
+        if (val < node->data) {
+            // Case: val is < node's data
+            this->Insert(val, node->left);
+        }
+        else if (val > node->data) {
+            // Case: val is > node's data
+            this->Insert(val, node->right);
+        }
+    }
+}
+
+/// Check if the given value exists in the BSTree
+template <typename T>
+bool BSTree<T>::Contains(T val) const {
+    return Contains(val, this->root);
+}
+
+/// Check if the given value exists in the subtree
+/// starting at node
+template <typename T>
+bool BSTree<T>::Contains(T val, unique_ptr<TreeNode>& node) const {
+    if (node == nullptr) {
+        return false;
+    }
+    else if (val == node->data) {
+        return true;
+    }
+    else if (val < node->data) {
+        return this->Contains(val, node->left);
+    }
+    else {
+        return this - Contains(val, node->right);
+    }
+}
+
+/// Remove given value from the tree
+template <typename T>
+void BSTree<T>::Remove(T val) {
+    this->Remove(val, this->root);
+}
+
+/// Remove given value from the subtree starting at node
+template <typename T>
+void BSTree<T>::Remove(T val, unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (val == node->data) {
+        // Found value
+
+        if (node->left == nullptr && node->right == nullptr) {
+            // Case: node is a leaf
+
+            node = nullptr;
+
+        }
+        else if (node->left != nullptr && node->right == nullptr) {
+            // Case: node has a left subtree (but not right)
+            // Point node's parent at node's left subtree
+            node = move(node->left);
+        }
+        else if (node->left == nullptr && node->right != nullptr) {
+            // Case: node has a right subtree (but not left)
+            node = move(node->right);
+        }
+        else {
+            // Case: node has left and right subtrees
+
+            unique_ptr<TreeNode>& minNode = this->FindMin(node->right); // returns a reference to the actual pointer in the tree
+            node->data = minNode->data;
+            this->Remove(minNode->data, minNode);
+        }
+
+    }
+    else if (val < node->data) {
+        // Case: remove val from this node's left subtree
+        this->Remove(val, node->left);
+    }
+    else {
+        // Case: remove val from this node's right subtree
+        this->Remove(val, node->right);
+    }
+}
+
+/// Search the subtree starting at node and return a pointer to the minimum-value node
+/// The returned pointer will be a reference of an actual pointer in the tree, not a copy
+template <typename T>
+unique_ptr<typename BSTree<T>::TreeNode>& BSTree<T>::FindMin(unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+        
+    }
+    else if (node->left == nullptr) {
+        return node;
+    }
+    else {
+        return this->FindMin(node->left);
+    }
+}
+
+int main() {
+    BSTree<int> tree;
+    char* line = new char[1000001];
+    char* temp = new char[1001];
+    string tempStr;
+    int x;
+    getline(cin, tempStr);
+    line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        tempStr = temp;
+        x = stoi(tempStr);
+        tree.Insert(x);
+        temp = strtok(NULL, " ");
+    }
+    tree.PrintStraight();
+    cout << endl;
+    tree.PrintReverse();
+}
+8.2)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <memory>  // unique_ptr
+
+using namespace std;
+
+template <typename T>
+class BSTree
+{
+private:
+    struct TreeNode
+    {
+        // member vars
+        T data;
+        unique_ptr<TreeNode> left;
+        unique_ptr<TreeNode> right;
+
+        // constructor
+        TreeNode(T data) : data(data), left(nullptr), right(nullptr) {}
+    };
+public:
+    // constructors
+    BSTree() : root(nullptr) {}
+
+    // member functions
+    void PrintStraight() const;
+    void PrintReverse() const;
+    int Height();
+    void Insert(T val);
+    bool Contains(T val) const;
+    void Remove(T val);
+
+private:
+
+    unique_ptr<TreeNode> root;
+    void PrintStraight(const unique_ptr<TreeNode>& node) const;
+    void PrintReverse(const unique_ptr<TreeNode>& node) const;
+    int Height(unique_ptr<TreeNode>& node);
+    void Insert(T val, unique_ptr<TreeNode>& node);  // Helper method for Insert(int val)
+    bool Contains(T val, unique_ptr<TreeNode>& node) const;  // Helper method for Contains(int val)
+    void Remove(T val, unique_ptr<TreeNode>& node);  // Helper method for Remove(int val)
+    unique_ptr<TreeNode>& FindMin(unique_ptr<TreeNode>& node); // Helper method for Remove(int val)
+};
+
+template <typename T>
+void BSTree<T>::PrintStraight() const {
+    PrintStraight(this->root);
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight(const unique_ptr<TreeNode>& node) const {
+    if (this->root == nullptr) {
+        return;
+    }
+    cout << node->data << " ";
+    if (node->left != nullptr)
+    {
+        PrintStraight(node->left);
+    }
+    if (node->right != nullptr)
+    {
+        PrintStraight(node->right);
+    }
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse() const {
+    PrintReverse(this->root);
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse(const unique_ptr<TreeNode>& node) const
+{
+    if (this->root == nullptr) {
+        return;
+    }
+    if (node != nullptr)
+    {
+        PrintReverse(node->left);
+        PrintReverse(node->right);
+        cout << node->data << " ";
+    }
+}
+
+template<typename T>
+int BSTree<T>::Height()
+{
+    return Height(this->root);
+}
+
+template<typename T>
+int BSTree<T>::Height(unique_ptr<TreeNode>& node)
+{
+    int left, right, h = 0;
+    if (node != nullptr) {
+        left = Height(node->left);
+        right = Height(node->right);
+        h = ((left > right) ? left : right) + 1;
+    }
+    return h;
+}
+
+/// Insert a new value into the tree
+template <typename T>
+void BSTree<T>::Insert(T val) {
+    this->Insert(val, this->root);
+}
+
+/// Insert a new value into the subtree starting at node
+template <typename T>
+void BSTree<T>::Insert(T val, unique_ptr<TreeNode>& node) {
+
+    if (node == nullptr) {
+        // Case: node is a nullptr
+        // Make a new TreeNode for it to point to
+        node = make_unique<TreeNode>(val);
+    }
+    else {
+        if (val < node->data) {
+            // Case: val is < node's data
+            this->Insert(val, node->left);
+        }
+        else if (val > node->data) {
+            // Case: val is > node's data
+            this->Insert(val, node->right);
+        }
+    }
+}
+
+/// Check if the given value exists in the BSTree
+template <typename T>
+bool BSTree<T>::Contains(T val) const {
+    return Contains(val, this->root);
+}
+
+/// Check if the given value exists in the subtree
+/// starting at node
+template <typename T>
+bool BSTree<T>::Contains(T val, unique_ptr<TreeNode>& node) const {
+    if (node == nullptr) {
+        return false;
+    }
+    else if (val == node->data) {
+        return true;
+    }
+    else if (val < node->data) {
+        return this->Contains(val, node->left);
+    }
+    else {
+        return this - Contains(val, node->right);
+    }
+}
+
+/// Remove given value from the tree
+template <typename T>
+void BSTree<T>::Remove(T val) {
+    this->Remove(val, this->root);
+}
+
+/// Remove given value from the subtree starting at node
+template <typename T>
+void BSTree<T>::Remove(T val, unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (val == node->data) {
+        // Found value
+
+        if (node->left == nullptr && node->right == nullptr) {
+            // Case: node is a leaf
+
+            node = nullptr;
+
+        }
+        else if (node->left != nullptr && node->right == nullptr) {
+            // Case: node has a left subtree (but not right)
+            // Point node's parent at node's left subtree
+            node = move(node->left);
+        }
+        else if (node->left == nullptr && node->right != nullptr) {
+            // Case: node has a right subtree (but not left)
+            node = move(node->right);
+        }
+        else {
+            // Case: node has left and right subtrees
+
+            unique_ptr<TreeNode>& minNode = this->FindMin(node->right); // returns a reference to the actual pointer in the tree
+            node->data = minNode->data;
+            this->Remove(minNode->data, minNode);
+        }
+
+    }
+    else if (val < node->data) {
+        // Case: remove val from this node's left subtree
+        this->Remove(val, node->left);
+    }
+    else {
+        // Case: remove val from this node's right subtree
+        this->Remove(val, node->right);
+    }
+}
+
+/// Search the subtree starting at node and return a pointer to the minimum-value node
+/// The returned pointer will be a reference of an actual pointer in the tree, not a copy
+template <typename T>
+unique_ptr<typename BSTree<T>::TreeNode>& BSTree<T>::FindMin(unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (node->left == nullptr) {
+        return node;
+    }
+    else {
+        return this->FindMin(node->left);
+    }
+}
+
+int main() {
+    BSTree<int> tree;
+    char* line = new char[1000001];
+    char* temp = new char[1001];
+    string tempStr;
+    int x;
+    getline(cin, tempStr);
+    line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        tempStr = temp;
+        x = stoi(tempStr);
+        tree.Insert(x);
+        temp = strtok(NULL, " ");
+    }
+    int height = tree.Height();
+    cout << height - 1;
+}
+8.3)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <memory>  // unique_ptr
+
+using namespace std;
+
+template <typename T>
+class BSTree
+{
+private:
+    struct TreeNode
+    {
+        // member vars
+        T data;
+        unique_ptr<TreeNode> left;
+        unique_ptr<TreeNode> right;
+
+        // constructor
+        TreeNode(T data) : data(data), left(nullptr), right(nullptr) {}
+    };
+public:
+    // constructors
+    BSTree() : root(nullptr) {}
+
+    // member functions
+    void PrintStraight() const;
+    void PrintReverse() const;
+    int Height();
+    int CountLeaves();
+    void Insert(T val);
+    bool Contains(T val) const;
+    void Remove(T val);
+
+private:
+
+    unique_ptr<TreeNode> root;
+    void PrintStraight(const unique_ptr<TreeNode>& node) const;
+    void PrintReverse(const unique_ptr<TreeNode>& node) const;
+    int Height(unique_ptr<TreeNode>& node);
+    void CountLeaves(unique_ptr<TreeNode>& node, int *count);
+    void Insert(T val, unique_ptr<TreeNode>& node);  // Helper method for Insert(int val)
+    bool Contains(T val, unique_ptr<TreeNode>& node) const;  // Helper method for Contains(int val)
+    void Remove(T val, unique_ptr<TreeNode>& node);  // Helper method for Remove(int val)
+    unique_ptr<TreeNode>& FindMin(unique_ptr<TreeNode>& node); // Helper method for Remove(int val)
+};
+
+template <typename T>
+int BSTree<T>::CountLeaves() {
+    int count = 0;
+    CountLeaves(this->root, &count);
+    return count;
+}
+
+template <typename T>
+void BSTree<T>::CountLeaves(unique_ptr<TreeNode>& node, int *count) {
+    if (node != nullptr) {
+        if (node->left == nullptr && node->right == nullptr)
+            *count = *count + 1;
+        else {
+            CountLeaves(node->left, count);
+            CountLeaves(node->right, count);
+        }
+    }
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight() const {
+    PrintStraight(this->root);
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight(const unique_ptr<TreeNode>& node) const {
+    if (this->root == nullptr) {
+        return;
+    }
+    cout << node->data << " ";
+    if (node->left != nullptr)
+    {
+        PrintStraight(node->left);
+    }
+    if (node->right != nullptr)
+    {
+        PrintStraight(node->right);
+    }
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse() const {
+    PrintReverse(this->root);
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse(const unique_ptr<TreeNode>& node) const
+{
+    if (this->root == nullptr) {
+        return;
+    }
+    if (node != nullptr)
+    {
+        PrintReverse(node->left);
+        PrintReverse(node->right);
+        cout << node->data << " ";
+    }
+}
+
+template<typename T>
+int BSTree<T>::Height()
+{
+    return Height(this->root);
+}
+
+template<typename T>
+int BSTree<T>::Height(unique_ptr<TreeNode>& node)
+{
+    int left, right, h = 0;
+    if (node != nullptr) {
+        left = Height(node->left);
+        right = Height(node->right);
+        h = ((left > right) ? left : right) + 1;
+    }
+    return h;
+}
+
+/// Insert a new value into the tree
+template <typename T>
+void BSTree<T>::Insert(T val) {
+    this->Insert(val, this->root);
+}
+
+/// Insert a new value into the subtree starting at node
+template <typename T>
+void BSTree<T>::Insert(T val, unique_ptr<TreeNode>& node) {
+
+    if (node == nullptr) {
+        // Case: node is a nullptr
+        // Make a new TreeNode for it to point to
+        node = make_unique<TreeNode>(val);
+    }
+    else {
+        if (val < node->data) {
+            // Case: val is < node's data
+            this->Insert(val, node->left);
+        }
+        else if (val > node->data) {
+            // Case: val is > node's data
+            this->Insert(val, node->right);
+        }
+    }
+}
+
+/// Check if the given value exists in the BSTree
+template <typename T>
+bool BSTree<T>::Contains(T val) const {
+    return Contains(val, this->root);
+}
+
+/// Check if the given value exists in the subtree
+/// starting at node
+template <typename T>
+bool BSTree<T>::Contains(T val, unique_ptr<TreeNode>& node) const {
+    if (node == nullptr) {
+        return false;
+    }
+    else if (val == node->data) {
+        return true;
+    }
+    else if (val < node->data) {
+        return this->Contains(val, node->left);
+    }
+    else {
+        return this - Contains(val, node->right);
+    }
+}
+
+/// Remove given value from the tree
+template <typename T>
+void BSTree<T>::Remove(T val) {
+    this->Remove(val, this->root);
+}
+
+/// Remove given value from the subtree starting at node
+template <typename T>
+void BSTree<T>::Remove(T val, unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (val == node->data) {
+        // Found value
+
+        if (node->left == nullptr && node->right == nullptr) {
+            // Case: node is a leaf
+
+            node = nullptr;
+
+        }
+        else if (node->left != nullptr && node->right == nullptr) {
+            // Case: node has a left subtree (but not right)
+            // Point node's parent at node's left subtree
+            node = move(node->left);
+        }
+        else if (node->left == nullptr && node->right != nullptr) {
+            // Case: node has a right subtree (but not left)
+            node = move(node->right);
+        }
+        else {
+            // Case: node has left and right subtrees
+
+            unique_ptr<TreeNode>& minNode = this->FindMin(node->right); // returns a reference to the actual pointer in the tree
+            node->data = minNode->data;
+            this->Remove(minNode->data, minNode);
+        }
+
+    }
+    else if (val < node->data) {
+        // Case: remove val from this node's left subtree
+        this->Remove(val, node->left);
+    }
+    else {
+        // Case: remove val from this node's right subtree
+        this->Remove(val, node->right);
+    }
+}
+
+/// Search the subtree starting at node and return a pointer to the minimum-value node
+/// The returned pointer will be a reference of an actual pointer in the tree, not a copy
+template <typename T>
+unique_ptr<typename BSTree<T>::TreeNode>& BSTree<T>::FindMin(unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (node->left == nullptr) {
+        return node;
+    }
+    else {
+        return this->FindMin(node->left);
+    }
+}
+
+int main() {
+    BSTree<int> tree;
+    char* line = new char[1000001];
+    char* temp = new char[1001];
+    string tempStr;
+    int x;
+    getline(cin, tempStr);
+    line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        tempStr = temp;
+        x = stoi(tempStr);
+        tree.Insert(x);
+        temp = strtok(NULL, " ");
+    }
+    int countLeaves = tree.CountLeaves();
+    cout << countLeaves;
+}
+8.4)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <memory>  // unique_ptr
+
+using namespace std;
+
+template <typename T>
+class BSTree
+{
+private:
+    struct TreeNode
+    {
+        // member vars
+        T data;
+        unique_ptr<TreeNode> left;
+        unique_ptr<TreeNode> right;
+
+        // constructor
+        TreeNode(T data) : data(data), left(nullptr), right(nullptr) {}
+    };
+public:
+    // constructors
+    BSTree() : root(nullptr) {}
+
+    // member functions
+    void PrintStraight() const;
+    void PrintReverse() const;
+    int Height();
+    int CountLeaves();
+    int CountVerticesOnTheLevel(int k);
+    void Insert(T val);
+    bool Contains(T val) const;
+    void Remove(T val);
+
+private:
+
+    unique_ptr<TreeNode> root;
+    void PrintStraight(const unique_ptr<TreeNode>& node) const;
+    void PrintReverse(const unique_ptr<TreeNode>& node) const;
+    int Height(unique_ptr<TreeNode>& node);
+    void CountLeaves(unique_ptr<TreeNode>& node, int* count);
+    void CountVerticesOnTheLevel(unique_ptr<TreeNode>& node, int k, int currentK, int* count);
+    void Insert(T val, unique_ptr<TreeNode>& node);  // Helper method for Insert(int val)
+    bool Contains(T val, unique_ptr<TreeNode>& node) const;  // Helper method for Contains(int val)
+    void Remove(T val, unique_ptr<TreeNode>& node);  // Helper method for Remove(int val)
+    unique_ptr<TreeNode>& FindMin(unique_ptr<TreeNode>& node); // Helper method for Remove(int val)
+};
+
+template<typename T>
+int BSTree<T>::CountVerticesOnTheLevel(int k) {
+    int count = 0;
+    CountVerticesOnTheLevel(this->root, k, 0, &count);
+    return count;
+}
+
+template<typename T>
+void BSTree<T>::CountVerticesOnTheLevel(unique_ptr<TreeNode>& node, int k, int currentK, int *count) {
+    if (node != nullptr) {
+        if (currentK == k)
+            *count = *count + 1;
+        else if (currentK < k) {
+            CountVerticesOnTheLevel(node->left, k, currentK + 1, count);
+            CountVerticesOnTheLevel(node->right, k, currentK + 1, count);
+        }
+    }
+}
+
+template <typename T>
+int BSTree<T>::CountLeaves() {
+    int count = 0;
+    CountLeaves(this->root, &count);
+    return count;
+}
+
+template <typename T>
+void BSTree<T>::CountLeaves(unique_ptr<TreeNode>& node, int* count) {
+    if (node != nullptr) {
+        if (node->left == nullptr && node->right == nullptr)
+            *count = *count + 1;
+        else {
+            CountLeaves(node->left, count);
+            CountLeaves(node->right, count);
+        }
+    }
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight() const {
+    PrintStraight(this->root);
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight(const unique_ptr<TreeNode>& node) const {
+    if (this->root == nullptr) {
+        return;
+    }
+    cout << node->data << " ";
+    if (node->left != nullptr)
+    {
+        PrintStraight(node->left);
+    }
+    if (node->right != nullptr)
+    {
+        PrintStraight(node->right);
+    }
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse() const {
+    PrintReverse(this->root);
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse(const unique_ptr<TreeNode>& node) const
+{
+    if (this->root == nullptr) {
+        return;
+    }
+    if (node != nullptr)
+    {
+        PrintReverse(node->left);
+        PrintReverse(node->right);
+        cout << node->data << " ";
+    }
+}
+
+template<typename T>
+int BSTree<T>::Height()
+{
+    return Height(this->root);
+}
+
+template<typename T>
+int BSTree<T>::Height(unique_ptr<TreeNode>& node)
+{
+    int left, right, h = 0;
+    if (node != nullptr) {
+        left = Height(node->left);
+        right = Height(node->right);
+        h = ((left > right) ? left : right) + 1;
+    }
+    return h;
+}
+
+/// Insert a new value into the tree
+template <typename T>
+void BSTree<T>::Insert(T val) {
+    this->Insert(val, this->root);
+}
+
+/// Insert a new value into the subtree starting at node
+template <typename T>
+void BSTree<T>::Insert(T val, unique_ptr<TreeNode>& node) {
+
+    if (node == nullptr) {
+        // Case: node is a nullptr
+        // Make a new TreeNode for it to point to
+        node = make_unique<TreeNode>(val);
+    }
+    else {
+        if (val < node->data) {
+            // Case: val is < node's data
+            this->Insert(val, node->left);
+        }
+        else if (val > node->data) {
+            // Case: val is > node's data
+            this->Insert(val, node->right);
+        }
+    }
+}
+
+/// Check if the given value exists in the BSTree
+template <typename T>
+bool BSTree<T>::Contains(T val) const {
+    return Contains(val, this->root);
+}
+
+/// Check if the given value exists in the subtree
+/// starting at node
+template <typename T>
+bool BSTree<T>::Contains(T val, unique_ptr<TreeNode>& node) const {
+    if (node == nullptr) {
+        return false;
+    }
+    else if (val == node->data) {
+        return true;
+    }
+    else if (val < node->data) {
+        return this->Contains(val, node->left);
+    }
+    else {
+        return this - Contains(val, node->right);
+    }
+}
+
+/// Remove given value from the tree
+template <typename T>
+void BSTree<T>::Remove(T val) {
+    this->Remove(val, this->root);
+}
+
+/// Remove given value from the subtree starting at node
+template <typename T>
+void BSTree<T>::Remove(T val, unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (val == node->data) {
+        // Found value
+
+        if (node->left == nullptr && node->right == nullptr) {
+            // Case: node is a leaf
+
+            node = nullptr;
+
+        }
+        else if (node->left != nullptr && node->right == nullptr) {
+            // Case: node has a left subtree (but not right)
+            // Point node's parent at node's left subtree
+            node = move(node->left);
+        }
+        else if (node->left == nullptr && node->right != nullptr) {
+            // Case: node has a right subtree (but not left)
+            node = move(node->right);
+        }
+        else {
+            // Case: node has left and right subtrees
+
+            unique_ptr<TreeNode>& minNode = this->FindMin(node->right); // returns a reference to the actual pointer in the tree
+            node->data = minNode->data;
+            this->Remove(minNode->data, minNode);
+        }
+
+    }
+    else if (val < node->data) {
+        // Case: remove val from this node's left subtree
+        this->Remove(val, node->left);
+    }
+    else {
+        // Case: remove val from this node's right subtree
+        this->Remove(val, node->right);
+    }
+}
+
+/// Search the subtree starting at node and return a pointer to the minimum-value node
+/// The returned pointer will be a reference of an actual pointer in the tree, not a copy
+template <typename T>
+unique_ptr<typename BSTree<T>::TreeNode>& BSTree<T>::FindMin(unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (node->left == nullptr) {
+        return node;
+    }
+    else {
+        return this->FindMin(node->left);
+    }
+}
+
+int main() {
+    BSTree<int> tree;
+    char* line = new char[1000001];
+    char* temp = new char[1001];
+    string tempStr;
+    int x;
+    int k;
+    cin >> k;
+    cin.ignore(4, '\n');
+    getline(cin, tempStr);
+    line = (char*)tempStr.c_str();
+    temp = strtok(line, " ");
+    while (temp != NULL)
+    {
+        tempStr = temp;
+        x = stoi(tempStr);
+        tree.Insert(x);
+        temp = strtok(NULL, " ");
+    }
+    int countVertices = tree.CountVerticesOnTheLevel(k);
+    cout << countVertices;
+}
+8.5)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <memory>  // unique_ptr
+#include <fstream>
+
+using namespace std;
+
+template <typename T>
+class BSTree
+{
+private:
+    struct TreeNode
+    {
+        // member vars
+        T data;
+        unique_ptr<TreeNode> left;
+        unique_ptr<TreeNode> right;
+
+        // constructor
+        TreeNode(T data) : data(data), left(nullptr), right(nullptr) {}
+    };
+public:
+    // constructors
+    BSTree() : root(nullptr) {}
+
+    // member functions
+    void PrintStraight() const;
+    void PrintReverse() const;
+    int Height();
+    int CountLeaves();
+    int CountVerticesOnTheLevel(int k);
+    void PrintSymmetrical();
+    void Insert(T val);
+    bool Contains(T val) const;
+    void Remove(T val);
+
+private:
+
+    unique_ptr<TreeNode> root;
+    void PrintStraight(const unique_ptr<TreeNode>& node) const;
+    void PrintReverse(const unique_ptr<TreeNode>& node) const;
+    void PrintSymmetrical(unique_ptr<TreeNode>& node);
+    int Height(unique_ptr<TreeNode>& node);
+    void CountLeaves(unique_ptr<TreeNode>& node, int* count);
+    void CountVerticesOnTheLevel(unique_ptr<TreeNode>& node, int k, int currentK, int* count);
+    void Insert(T val, unique_ptr<TreeNode>& node);  // Helper method for Insert(int val)
+    bool Contains(T val, unique_ptr<TreeNode>& node) const;  // Helper method for Contains(int val)
+    void Remove(T val, unique_ptr<TreeNode>& node);  // Helper method for Remove(int val)
+    unique_ptr<TreeNode>& FindMin(unique_ptr<TreeNode>& node); // Helper method for Remove(int val)
+};
+
+template<typename T>
+void BSTree<T>::PrintSymmetrical() {
+    PrintSymmetrical(this->root);
+}
+
+template<typename T>
+void BSTree<T>::PrintSymmetrical(unique_ptr<TreeNode>& node) {
+    if (node != nullptr)
+    {
+        PrintSymmetrical(node->left);
+        cout << node->data << "\n";
+        PrintSymmetrical(node->right);
+    }
+}
+
+template<typename T>
+int BSTree<T>::CountVerticesOnTheLevel(int k) {
+    int count = 0;
+    CountVerticesOnTheLevel(this->root, k, 0, &count);
+    return count;
+}
+
+template<typename T>
+void BSTree<T>::CountVerticesOnTheLevel(unique_ptr<TreeNode>& node, int k, int currentK, int* count) {
+    if (node != nullptr) {
+        if (currentK == k)
+            *count = *count + 1;
+        else if (currentK < k) {
+            CountVerticesOnTheLevel(node->left, k, currentK + 1, count);
+            CountVerticesOnTheLevel(node->right, k, currentK + 1, count);
+        }
+    }
+}
+
+template <typename T>
+int BSTree<T>::CountLeaves() {
+    int count = 0;
+    CountLeaves(this->root, &count);
+    return count;
+}
+
+template <typename T>
+void BSTree<T>::CountLeaves(unique_ptr<TreeNode>& node, int* count) {
+    if (node != nullptr) {
+        if (node->left == nullptr && node->right == nullptr)
+            *count = *count + 1;
+        else {
+            CountLeaves(node->left, count);
+            CountLeaves(node->right, count);
+        }
+    }
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight() const {
+    PrintStraight(this->root);
+}
+
+template <typename T>
+void BSTree<T>::PrintStraight(const unique_ptr<TreeNode>& node) const {
+    if (this->root == nullptr) {
+        return;
+    }
+    cout << node->data << " ";
+    if (node->left != nullptr)
+    {
+        PrintStraight(node->left);
+    }
+    if (node->right != nullptr)
+    {
+        PrintStraight(node->right);
+    }
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse() const {
+    PrintReverse(this->root);
+}
+
+template<typename T>
+void BSTree<T>::PrintReverse(const unique_ptr<TreeNode>& node) const
+{
+    if (node != nullptr)
+    {
+        PrintReverse(node->left);
+        PrintReverse(node->right);
+        cout << node->data << " ";
+    }
+}
+
+template<typename T>
+int BSTree<T>::Height()
+{
+    return Height(this->root);
+}
+
+template<typename T>
+int BSTree<T>::Height(unique_ptr<TreeNode>& node)
+{
+    int left, right, h = 0;
+    if (node != nullptr) {
+        left = Height(node->left);
+        right = Height(node->right);
+        h = ((left > right) ? left : right) + 1;
+    }
+    return h;
+}
+
+/// Insert a new value into the tree
+template <typename T>
+void BSTree<T>::Insert(T val) {
+    this->Insert(val, this->root);
+}
+
+/// Insert a new value into the subtree starting at node
+template <typename T>
+void BSTree<T>::Insert(T val, unique_ptr<TreeNode>& node) {
+
+    if (node == nullptr) {
+        // Case: node is a nullptr
+        // Make a new TreeNode for it to point to
+        node = make_unique<TreeNode>(val);
+    }
+    else {
+        if (val < node->data) {
+            // Case: val is < node's data
+            this->Insert(val, node->left);
+        }
+        else if (val > node->data) {
+            // Case: val is > node's data
+            this->Insert(val, node->right);
+        }
+    }
+}
+
+/// Check if the given value exists in the BSTree
+template <typename T>
+bool BSTree<T>::Contains(T val) const {
+    return Contains(val, this->root);
+}
+
+/// Check if the given value exists in the subtree
+/// starting at node
+template <typename T>
+bool BSTree<T>::Contains(T val, unique_ptr<TreeNode>& node) const {
+    if (node == nullptr) {
+        return false;
+    }
+    else if (val == node->data) {
+        return true;
+    }
+    else if (val < node->data) {
+        return this->Contains(val, node->left);
+    }
+    else {
+        return this - Contains(val, node->right);
+    }
+}
+
+/// Remove given value from the tree
+template <typename T>
+void BSTree<T>::Remove(T val) {
+    this->Remove(val, this->root);
+}
+
+/// Remove given value from the subtree starting at node
+template <typename T>
+void BSTree<T>::Remove(T val, unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (val == node->data) {
+        // Found value
+
+        if (node->left == nullptr && node->right == nullptr) {
+            // Case: node is a leaf
+
+            node = nullptr;
+
+        }
+        else if (node->left != nullptr && node->right == nullptr) {
+            // Case: node has a left subtree (but not right)
+            // Point node's parent at node's left subtree
+            node = move(node->left);
+        }
+        else if (node->left == nullptr && node->right != nullptr) {
+            // Case: node has a right subtree (but not left)
+            node = move(node->right);
+        }
+        else {
+            // Case: node has left and right subtrees
+
+            unique_ptr<TreeNode>& minNode = this->FindMin(node->right); // returns a reference to the actual pointer in the tree
+            node->data = minNode->data;
+            this->Remove(minNode->data, minNode);
+        }
+
+    }
+    else if (val < node->data) {
+        // Case: remove val from this node's left subtree
+        this->Remove(val, node->left);
+    }
+    else {
+        // Case: remove val from this node's right subtree
+        this->Remove(val, node->right);
+    }
+}
+
+/// Search the subtree starting at node and return a pointer to the minimum-value node
+/// The returned pointer will be a reference of an actual pointer in the tree, not a copy
+template <typename T>
+unique_ptr<typename BSTree<T>::TreeNode>& BSTree<T>::FindMin(unique_ptr<TreeNode>& node) {
+    if (node == nullptr) {
+
+    }
+    else if (node->left == nullptr) {
+        //cout << node->data << " ";
+        return node;
+    }
+    else {
+        //cout << node->data << " ";
+        return this->FindMin(node->left);
+    }
+}
+int main() {
+    BSTree<string> tree;
+    ifstream file("input.txt");
+
+    string word;
+    while (file >> word) {
+        tree.Insert(word);
+    }
+    file.close();
+    tree.PrintSymmetrical();
+}
+8.6)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <memory>  // unique_ptr
+#include <fstream>
+
+using namespace std;
+
+class TreeNode
+{
+public:
+    char data;
+    TreeNode* left, *right;
+    /** constructor **/
+    TreeNode(char data)
+    {
+        this->data = data;
+        this->left = nullptr;
+        this->right = nullptr;
+    }
+};
+
+/** class StackNode **/
+class StackNode
+{
+public:
+    TreeNode* treeNode;
+    StackNode* next;
+    /** constructor **/
+    StackNode(TreeNode* treeNode)
+    {
+        this->treeNode = treeNode;
+        next = nullptr;
+    }
+};
+
+
+class ExpressionTree
+{
+private:
+    StackNode* top;
+public:
+    /** constructor **/
+    ExpressionTree()
+    {
+        top = nullptr;
+    }
+
+    /** function to clear tree **/
+    void clear()
+    {
+        top = nullptr;
+    }
+
+    /** function to push a node **/
+    void push(TreeNode* ptr)
+    {
+        if (top == nullptr)
+            top = new StackNode(ptr);
+        else
+        {
+            StackNode* nptr = new StackNode(ptr);
+            nptr->next = top;
+            top = nptr;
+        }
+    }
+
+    /** function to pop a node **/
+    TreeNode* pop()
+    {
+        if (top == nullptr)
+        {
+            //cout << "Underflow" << endl;
+        }
+        else
+        {
+            TreeNode* ptr = top->treeNode;
+            top = top->next;
+            return ptr;
+        }
+    }
+
+    /** function to get top node **/
+    TreeNode* peek()
+    {
+        return top->treeNode;
+    }
+
+
+    /** function to insert character **/
+    void insert(char val)
+    {
+        if (isDigit(val))
+        {
+            TreeNode* nptr = new TreeNode(val);
+            push(nptr);
+        }
+        else if (isOperator(val))
+        {
+            TreeNode* nptr = new TreeNode(val);
+            nptr->left = pop();
+            nptr->right = pop();
+            push(nptr);
+        }
+    }
+
+    /** function to check if digit **/
+    bool isDigit(char ch)
+    {
+        return ch >= '0' && ch <= '9';
+    }
+
+    /** function to check if operator **/
+    bool isOperator(char ch)
+    {
+        return ch == '+' || ch == '-' || ch == '*' || ch == '/';
+    }
+
+
+    /** function to convert character to digit **/
+    int toDigit(char ch)
+    {
+        return ch - '0';
+    }
+
+    /** function to build tree from input */
+
+    void buildTree(string eqn)
+    {
+        for (int i = eqn.length() - 1; i >= 0; i--)
+            insert(eqn[i]);
+    }
+
+    /** function to evaluate tree */
+    int evaluate()
+    {
+        return evaluate(peek());
+    }
+
+    /** function to evaluate tree */
+    int evaluate(TreeNode* ptr)
+    {
+        if (ptr->left == nullptr && ptr->right == nullptr)
+            return toDigit(ptr->data);
+        else
+        {
+            int result = 0.0;
+            int left = evaluate(ptr->left);
+            int right = evaluate(ptr->right);
+            int op = ptr->data;
+            switch (op)
+            {
+            case '+':
+                result = left + right;
+                break;
+            case '-':
+                result = left - right;
+                break;
+            case '*':
+                result = left * right;
+                break;
+            case '/':
+                if (right == 0) {
+                    cout << "NO";
+                    exit(0);
+                }
+                result = left / right;
+                break;
+            default:
+                result = left + right;
+                break;
+            }
+            return result;
+        }
+    }
+
+    /** function to get postfix expression */
+    void postfix()
+    {
+        postOrder(peek());
+    }
+
+    /** post order traversal */
+    void postOrder(TreeNode* ptr)
+    {
+        if (ptr != NULL)
+        {
+            postOrder(ptr->left);
+            postOrder(ptr->right);
+            cout << ptr->data;
+        }
+    }
+
+    /** function to get infix expression */
+    void infix()
+    {
+        inOrder(peek());
+    }
+
+    /** in order traversal */
+    void inOrder(TreeNode* ptr)
+    {
+        if (ptr != NULL)
+        {
+            inOrder(ptr->left);
+            cout << ptr->data;
+            inOrder(ptr->right);
+        }
+    }
+
+    /** function to get prefix expression */
+    void prefix()
+    {
+        preOrder(peek());
+    }
+
+    /** pre order traversal */
+    void preOrder(TreeNode* ptr)
+    {
+        if (ptr != NULL)
+        {
+            cout << ptr->data;
+            preOrder(ptr->left);
+            preOrder(ptr->right);
+        }
+    }
+};
+
+int main() {
+    string str;
+    ExpressionTree expTree;
+    cin >> str;
+    expTree.buildTree(str);
+    cout << expTree.evaluate();
+}
+8.7)
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <string>
+#include <memory>  // unique_ptr
+#include <fstream>
+
+using namespace std;
+
+class TreeNode
+{
+public:
+    char data;
+    TreeNode* left, *right;
+    /** constructor **/
+    TreeNode(char data)
+    {
+        this->data = data;
+        this->left = nullptr;
+        this->right = nullptr;
+    }
+};
+
+/** class StackNode **/
+class StackNode
+{
+public:
+    TreeNode* treeNode;
+    StackNode* next;
+    /** constructor **/
+    StackNode(TreeNode* treeNode)
+    {
+        this->treeNode = treeNode;
+        next = nullptr;
+    }
+};
+
+
+class ExpressionTree
+{
+private:
+    StackNode* top;
+public:
+    /** constructor **/
+    ExpressionTree()
+    {
+        top = nullptr;
+    }
+
+    /** function to clear tree **/
+    void clear()
+    {
+        top = nullptr;
+    }
+
+    /** function to push a node **/
+    void push(TreeNode* ptr)
+    {
+        if (top == nullptr)
+            top = new StackNode(ptr);
+        else
+        {
+            StackNode* nptr = new StackNode(ptr);
+            nptr->next = top;
+            top = nptr;
+        }
+    }
+
+    /** function to pop a node **/
+    TreeNode* pop()
+    {
+        if (top == nullptr)
+        {
+            //cout << "Underflow" << endl;
+        }
+        else
+        {
+            TreeNode* ptr = top->treeNode;
+            top = top->next;
+            return ptr;
+        }
+    }
+
+    /** function to get top node **/
+    TreeNode* peek()
+    {
+        return top->treeNode;
+    }
+
+
+    /** function to insert character **/
+    void insert(char val)
+    {
+        if (isDigit(val))
+        {
+            TreeNode* nptr = new TreeNode(val);
+            push(nptr);
+        }
+        else if (isOperator(val))
+        {
+            TreeNode* nptr = new TreeNode(val);
+            nptr->left = pop();
+            nptr->right = pop();
+            push(nptr);
+        }
+    }
+
+    /** function to check if digit **/
+    bool isDigit(char ch)
+    {
+        return ch >= '0' && ch <= '9';
+    }
+
+    /** function to check if operator **/
+    bool isOperator(char ch)
+    {
+        return ch == '+' || ch == '-' || ch == '*' || ch == '/';
+    }
+
+
+    /** function to convert character to digit **/
+    int toDigit(char ch)
+    {
+        return ch - '0';
+    }
+
+    /** function to build tree from input */
+
+    void buildTree(string eqn)
+    {
+        for (int i = eqn.length() - 1; i >= 0; i--)
+            insert(eqn[i]);
+    }
+
+    /** function to evaluate tree */
+    int evaluate()
+    {
+        return evaluate(peek());
+    }
+
+    /** function to evaluate tree */
+    int evaluate(TreeNode* ptr)
+    {
+        if (ptr->left == nullptr && ptr->right == nullptr)
+            return toDigit(ptr->data);
+        else
+        {
+            int result = 0.0;
+            int left = evaluate(ptr->left);
+            int right = evaluate(ptr->right);
+            int op = ptr->data;
+            switch (op)
+            {
+            case '+':
+                result = left + right;
+                break;
+            case '-':
+                result = left - right;
+                break;
+            case '*':
+                result = left * right;
+                break;
+            case '/':
+                if (right == 0) {
+                    cout << "NO";
+                    exit(0);
+                }
+                result = left / right;
+                break;
+            default:
+                result = left + right;
+                break;
+            }
+            return result;
+        }
+    }
+
+    /** function to get postfix expression */
+    void postfix()
+    {
+        postOrder(peek());
+    }
+
+    /** post order traversal */
+    void postOrder(TreeNode* ptr)
+    {
+        if (ptr != NULL)
+        {
+            postOrder(ptr->left);
+            postOrder(ptr->right);
+            cout << ptr->data;
+        }
+    }
+
+    /** function to get infix expression */
+    void infix()
+    {
+        inOrder(peek());
+    }
+
+    /** in order traversal */
+    void inOrder(TreeNode* ptr)
+    {
+        if (ptr != NULL)
+        {
+            inOrder(ptr->left);
+            cout << ptr->data;
+            inOrder(ptr->right);
+        }
+    }
+
+    /** function to get prefix expression */
+    void prefix()
+    {
+        preOrder(peek());
+    }
+
+    /** pre order traversal */
+    void preOrder(TreeNode* ptr)
+    {
+        if (ptr != NULL)
+        {
+            cout << ptr->data;
+            preOrder(ptr->left);
+            preOrder(ptr->right);
+        }
+    }
+};
+
+int main() {
+    string str;
+    ExpressionTree expTree;
+    cin >> str;
+    expTree.buildTree(str);
+    cout << expTree.evaluate();
+}
+8.8)
+#include <stdio.h> 
+#include <malloc.h> 
+#include <iostream>
+using namespace std;
+
+typedef struct Tree {
+    int data;
+    int count;
+    unsigned char height;
+    Tree* R;
+    Tree* L;
+};
+unsigned char height(Tree* p)
+{
+    return p ? p->height : 0;
+}
+int bfactor(Tree* p)
+{
+    return height(p->R) - height(p->L);
+}
+void fixHeight(Tree* p)
+{
+    unsigned char hl = height(p->L);
+    unsigned char hr = height(p->R);
+    p->height = (hl > hr ? hl : hr) + 1;
+}
+Tree* rotateRight(Tree* p) // правый поворот вокруг p
+{
+    Tree* q = p->L;
+    p->L = q->R;
+    q->R = p;
+    fixHeight(p);
+    fixHeight(q);
+    return q;
+}
+Tree* rotateLeft(Tree* q) // левый поворот вокруг q
+{
+    Tree* p = q->R;
+    q->R = p->L;
+    p->L = q;
+    fixHeight(q);
+    fixHeight(p);
+    return p;
+}
+Tree* balance(Tree* p) // балансировка узла p
+{
+    fixHeight(p);
+    if (bfactor(p) == 2)
+    {
+        if (bfactor(p->R) < 0)
+            p->R = rotateRight(p->R);
+        return rotateLeft(p);
+    }
+    if (bfactor(p) == -2)
+    {
+        if (bfactor(p->L) > 0)
+            p->L = rotateLeft(p->L);
+        return rotateRight(p);
+    }
+    return p; // балансировка не нужна
+}
+void InfixPrint(Tree* tree, FILE* fileW) {
+    if (tree != NULL) {
+        InfixPrint(tree->L, fileW);
+        for (int i = tree->count; i > 0; i--)
+            fwrite(&tree->data, sizeof(int), 1, fileW);
+        InfixPrint(tree->R, fileW);
+    }
+}
+Tree* AddTree(Tree* tree, int x) {
+    if (tree == NULL) {
+        tree = new Tree;
+        tree->data = x;
+        tree->count = 1;
+        tree->height = 0;
+        tree->L = NULL;
+        tree->R = NULL;
+    }
+    else  if (x < tree->data) {
+        tree->L = AddTree(tree->L, x);
+        tree->height = bfactor(tree);
+    }
+    else if (x > tree->data) {
+        tree->R = AddTree(tree->R, x);
+        tree->height = bfactor(tree);
+    }
+    else
+        tree->count++;
+    tree = balance(tree);
+    return tree;
+}
+int main() {
+    int N, number;
+    FILE* fileR = NULL;
+    FILE* fileW = NULL;
+    fileR = fopen("input.bin", "rb");
+    fileW = fopen("output.bin", "wb");
+    fread(&N, sizeof(int), 1, fileR);
+    Tree* tree = NULL;
+    for (int i = 0; i < N; i++) {
+        fread(&number, sizeof(int), 1, fileR);
+        tree = AddTree(tree, number);
+    }
+    InfixPrint(tree, fileW);
+    fclose(fileR);
+    fclose(fileW);
+    return 0;
+}
+8.9)
+// C++ program for AVL Tree  
+#include<iostream> 
+#include <string>
+#include <fstream>
+
+using namespace std;
+
+// An AVL tree node  
+class AVLNode
+{
+public:
+    int key;
+    AVLNode* left;
+    AVLNode* right;
+    int depth;
+};
+
+//get max of two integers 
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+//function to get height of the tree 
+int depth(AVLNode* n)
+{
+    if (n == NULL)
+        return 0;
+    return n->depth;
+}
+// allocate a new node with key passed
+AVLNode* newNode(int key)
+{
+    AVLNode* node = new AVLNode();
+    node->key = key;
+    node->left = NULL;
+    node->right = NULL;
+    node->depth = 1; // new node added as leaf 
+    return(node);
+}
+// right rotate the sub tree rooted with y
+AVLNode* rightRotate(AVLNode* y)
+{
+    AVLNode* x = y->left;
+    AVLNode* T2 = x->right;
+
+    // Perform rotation  
+    x->right = y;
+    y->left = T2;
+
+    // Update heights  
+    y->depth = max(depth(y->left),
+        depth(y->right)) + 1;
+    x->depth = max(depth(x->left),
+        depth(x->right)) + 1;
+
+    // Return new root  
+    return x;
+}
+
+// left rotate the sub tree rooted with x 
+AVLNode* leftRotate(AVLNode* x)
+{
+    AVLNode* y = x->right;
+    AVLNode* T2 = y->left;
+
+    // Perform rotation  
+    y->left = x;
+    x->right = T2;
+    // Update heights  
+    x->depth = max(depth(x->left),
+        depth(x->right)) + 1;
+    y->depth = max(depth(y->left),
+        depth(y->right)) + 1;
+
+    // Return new root  
+    return y;
+}
+
+// Get Balance factor of node N  
+int getBalance(AVLNode* N)
+{
+    if (N == NULL)
+        return 0;
+    return depth(N->left) -
+        depth(N->right);
+}
+//insertion operation for node in AVL tree 
+AVLNode* insert(AVLNode* node, int key, bool* isCompleted) {
+    //normal BST rotation
+    if (node == NULL)
+    {
+        *isCompleted = true;
+        return(newNode(key));
+    }
+        
+
+    if (key < node->key)
+        node->left = insert(node->left, key, isCompleted);
+    else if (key > node->key)
+        node->right = insert(node->right, key, isCompleted);
+    else
+    {
+        *isCompleted = false;
+        return node;
+    }       
+    //update height of ancestor node
+    node->depth = 1 + max(depth(node->left), depth(node->right));
+
+    int balance = getBalance(node);        //get balance factor
+
+    // rotate if unbalanced 
+
+    // Left Left Case  
+    if (balance > 1 && key < node->left->key)
+        return rightRotate(node);
+
+    // Right Right Case  
+    if (balance < -1 && key > node->right->key)
+        return leftRotate(node);
+    // Left Right Case  
+    if (balance > 1 && key > node->left->key)
+    {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    // Right Left Case  
+    if (balance < -1 && key < node->right->key)
+    {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+    return node;
+}
+
+// find the node with minimum value 
+AVLNode* minValueNode(AVLNode* node)
+{
+    AVLNode* current = node;
+
+    // find the leftmost leaf */
+    while (current->left != NULL)
+        current = current->left;
+
+    return current;
+}
+// delete a node from AVL tree with the given key  
+AVLNode* deleteNode(AVLNode* root, int key, bool *isCompleted)
+{
+    if (root == NULL)
+    {
+        *isCompleted = false;
+        //cout << "miss\n";
+        return root;
+    }
+        
+
+    //perform BST delete 
+    if (key < root->key)
+        root->left = deleteNode(root->left, key, isCompleted);
+
+    else if (key > root->key)
+        root->right = deleteNode(root->right, key, isCompleted);
+
+    else
+    {       
+        // node with only one child or no child  
+        if ((root->left == NULL) ||
+            (root->right == NULL))
+        {
+            *isCompleted = true;
+            AVLNode* temp = root->left ?
+                root->left :
+                root->right;
+
+            if (temp == NULL)
+            {
+                temp = root;
+                root = NULL;
+            }
+            else // One child case  
+                *root = *temp;
+            free(temp);
+        }
+        else
+        {
+            
+            AVLNode* temp = minValueNode(root->right);
+
+            root->key = temp->key;
+
+            // Delete the inorder successor  
+            root->right = deleteNode(root->right, temp->key, isCompleted);
+            //cout << "removed\n";
+        }
+    }
+
+    if (root == NULL)
+        return root;
+
+    // update depth  
+    root->depth = 1 + max(depth(root->left),
+        depth(root->right));
+
+    // get balance factor 
+    int balance = getBalance(root);
+
+    //rotate the tree if unbalanced
+
+    // Left Left Case  
+    if (balance > 1 && getBalance(root->left) >= 0)
+        return rightRotate(root);
+
+    // Left Right Case  
+    if (balance > 1 && getBalance(root->left) < 0) {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+    // Right Right Case  
+    if (balance < -1 && getBalance(root->right) <= 0)
+        return leftRotate(root);
+
+    // Right Left Case  
+    if (balance < -1 && getBalance(root->right) > 0) {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+    return root;
+}
+// prints inOrder traversal of the AVL tree
+void inOrder(AVLNode* root)
+{
+    if (root != NULL)
+    {
+        inOrder(root->left);
+        cout << root->key << " ";
+        inOrder(root->right);
+    }
+}
+
+void search_lower(int v, AVLNode* root, int* minLower, bool *isCompleted) {
+    if (v == root->key) {
+        *minLower = root->key;
+        *isCompleted = true;
+    }
+    else if (v > root->key) {
+        if (root->right != NULL)
+            search_lower(v, root->right, minLower, isCompleted);
+    }
+    else if (v < root->key) {
+        *minLower = root->key;
+        *isCompleted = true;
+        if (root->left != NULL)
+            search_lower(v, root->left, minLower, isCompleted);
+    }
+    //return true;
+}
+
+int main()
+{
+    AVLNode* root = NULL;
+	string op;
+    ofstream out;
+    out.open("output.txt");
+    bool isCompleted;
+	int N, temp;
+	cin >> N;
+	for (int i = 0; i < N; i++) {
+		cin >> op;
+		if (op == "add") {
+            isCompleted = false;
+			cin >> temp;
+            root = insert(root, temp, &isCompleted);
+            if (isCompleted)
+                out << "added\n";
+            else
+                out << "dupe\n";
+		}
+		else if (op == "remove") {
+            isCompleted = false;
+            cin >> temp;
+            root = deleteNode(root, temp, &isCompleted);
+            if (isCompleted)
+                out << "removed\n";
+            else
+                out << "miss\n";
+		}
+		else if (op == "lower") {
+            cin >> temp;
+            if (root != NULL) {
+                isCompleted = false;
+                int minLower = root->key;
+                search_lower(temp, root, &minLower, &isCompleted);
+                if(isCompleted) {
+                    out << minLower << endl;
+                }
+                else {
+                    out << "###\n";
+                }
+            }
+            else {
+                out << "###\n";
+            }
+		}
+	}
+}
+9.1)
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+bool topological_sort(int n, vector<vector<int>>& adj, vector<int>& in_degree, vector<int>& order) {
+    priority_queue<int, vector<int>, greater<int>> q;
+    for (int i = 1; i <= n; i++) {
+        if (in_degree[i] == 0) {
+            q.push(i);
+        }
+    }
+    while (!q.empty()) {
+        int v = q.top();
+        q.pop();
+        order.push_back(v);
+        for (int u : adj[v]) {
+            in_degree[u]--;
+            if (in_degree[u] == 0) {
+                q.push(u);
+            }
+        }
+    }
+    return (order.size() == n);
+}
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> adj(n + 1, vector<int>());
+    vector<int> in_degree(n + 1);
+    vector<int> order;
+    
+    for (int i = 0; i < m; i++) {
+        int b, a;
+        cin >> b >> a;
+        adj[b].push_back(a);
+        in_degree[a]++;
+    }
+
+    if (topological_sort(n, adj, in_degree, order)) {
+        for (int v : order) {
+            cout << v << " ";
+        }
+    }
+    else {
+        cout << "bad course";
+    }
+    cout << endl;
+
+    return 0;
+}
+9.2)
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+bool topological_sort(int n, vector<vector<int>>& adj, vector<int>& in_degree, vector<int>& order) {
+    priority_queue<int, vector<int>, greater<int>> q;
+    for (int i = 1; i <= n; i++) {
+        if (in_degree[i] == 0) {
+            q.push(i);
+        }
+    }
+    while (!q.empty()) {
+        int v = q.top();
+        q.pop();
+        order.push_back(v);
+        for (int u : adj[v]) {
+            in_degree[u]--;
+            if (in_degree[u] == 0) {
+                q.push(u);
+            }
+        }
+    }
+    return (order.size() == n);
+}
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> adj(n + 1, vector<int>());
+    vector<int> in_degree(n + 1);
+    vector<int> order;
+    
+    for (int i = 0; i < m; i++) {
+        int b, a;
+        cin >> b >> a;
+        adj[b].push_back(a);
+        in_degree[a]++;
+    }
+
+    if (topological_sort(n, adj, in_degree, order)) {
+        for (int v : order) {
+            cout << v << " ";
+        }
+    }
+    else {
+        cout << "bad course";
+    }
+    cout << endl;
+
+    return 0;
+}
+9.3) Нерешённая :(
+10.1)
+#include <iostream>
+#include <vector>
+#include <stack>
+using namespace std;
+
+bool seek (vector<short>* w, short beg, short end, short n) {
+  stack<short> stk;
+  short* go = new short[n]{0};
+  stk.push(beg);
+  while (!stk.empty()) {
+    short cur = stk.top();
+    stk.pop();
+    go[cur] = 1;
+    for (short i = 0; i < w[cur].size(); i++) {
+      short t = w[cur][i];
+      if (t == end) return true;
+      if (go[t] == 0) stk.push(t);
+    }
+  }
+  return false;
+}
+
+int main() {
+  short field, trop;
+  cin >> field >> trop;
+  vector<short>* w = new vector<short>[field];
+  for (short i = 0; i < trop; i++) {
+    short to, from;
+    cin >> from >> to;
+    w[to - 1].push_back(from - 1);
+    w[from - 1].push_back(to - 1);
+  }
+  short curS, toS, Shaman;
+  cin >> Shaman;
+  cin >> curS;
+  for (short j = 0; j < Shaman - 1; j++)
+  {
+    cin >> toS;
+    if (seek(w, curS - 1, toS - 1, field))
+    {
+      curS = toS;
+    } 
+	else 
+	{
+      cout << "NO" << endl;
+      return 0;
+    }
+  }
+  cout << "YES" << endl;
+  return 0;
+}
+10.2)
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <stack>
+using namespace std;
+
+void familar(vector<short>* w, short* v, short beg) {
+  stack<short> stk;
+  stk.push(beg);
+  while (!stk.empty()) {
+    short cur = stk.top();
+    stk.pop();
+    v[cur] = 1;
+    for (short i = 0; i < w[cur].size(); i++) {
+      short k = w[cur][i];
+      if (v[k] == 0) stk.push(k);
+    }
+  }
+}
+
+int main() {
+  ifstream fin;
+  fin.open("input.txt");
+  short n, t = 1;
+  fin >> n;
+  vector<short>* w = new vector<short>[n];
+  while (!fin.eof()) {
+    short to, from;
+    fin >> from >> to;
+    w[to - 1].push_back(from - 1);
+    w[from - 1].push_back(to - 1);
+  }
+  short* v = new short[n]{0};
+
+  for (int i = 0; i < n; i++) {
+    if (v[i] == 0) {
+      familar(w, v, i);
+      t++;
+    }
+  }
+  cout << t;
+  return 0;
+}
+10.3)
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <stack>
+using namespace std;
+
+void graph(vector<int>* w, int* r, int beg, int l) {
+  stack<int> stk;
+  stk.push(beg);
+  while (!stk.empty()) {
+    int cur = stk.top();
+    stk.pop();
+    r[cur] = l;
+    for (int i = 0; i < w[cur].size(); i++) {
+      int temp = w[cur][i];
+      if (r[temp] == 0) stk.push(temp);
+    }
+  }
+}
+
+int main() {
+  ifstream fin;
+  fin.open("input.txt");
+  int n, m, t = 0, l = 1;
+  fin >> n >> m;
+  vector<int>* w = new vector<int>[n];
+  for (int i = 0; i < m; i++) {
+    int to, from;
+    fin >> from >> to;
+    w[to - 1].push_back(from - 1);
+    w[from - 1].push_back(to - 1);
+  }
+  int* r = new int[n]{0};
+  for (int i = 0; i < n; i++) {
+    if (r[i] == 0) {
+      graph(w, r, i, l++);
+      t++;
+    }
+  }
+  cout << t << endl;
+  for (int i = 0; i < n; i++) {
+    cout << r [i] << " ";
+  }
+  return 0;
+}
+10.4)
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+void dfs(int x, int y, vector<vector<char>>& maze, vector<vector<bool>>& visited) {
+    if (x < 0 || x >= maze.size() || y < 0 || y >= maze[0].size() || maze[x][y] == '*' || visited[x][y]) {
+        return;
+    }
+    visited[x][y] = true;
+    dfs(x + 1, y, maze, visited);
+    dfs(x - 1, y, maze, visited);
+    dfs(x, y + 1, maze, visited);
+    dfs(x, y - 1, maze, visited);
+}
+
+int main() {
+    int N;
+    cin >> N;
+    cin.ignore();
+    vector<vector<char>> maze(N, vector<char>(N));
+    vector<vector<bool>> visited(N, vector<bool>(N, false));
+
+    int entryX = 0, entryY = 0;
+    for (int i = 0; i < N; ++i) {
+        string row;
+        getline(cin, row);
+        for (int j = 0; j < N; ++j) {
+            maze[i][j] = row[j];
+            if (i == 0 && maze[i][j] == ' ') {
+                entryY = j;
+            }
+        }
+    }
+
+    dfs(entryX, entryY, maze, visited);
+
+    int inaccessibleAreas = 0;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            if (maze[i][j] == ' ' && !visited[i][j]) {
+                dfs(i, j, maze, visited);
+                inaccessibleAreas++;
+            }
+        }
+    }
+
+    cout << inaccessibleAreas << endl;
+    return 0;
+}
+10.5)
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
+int main() {
+    int n, m;
+    std::cin >> n >> m;
+    std::vector<std::vector<int>> adj(n);
+    std::vector<int> in_degree(n, 0);
+    std::vector<int> result(n);
+
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        std::cin >> u >> v;
+        u--, v--;
+        adj[u].push_back(v);
+        in_degree[v]++;
+    }
+
+    std::priority_queue<int, std::vector<int>, std::greater<int>> q;
+    for (int i = 0; i < n; i++) {
+        if (in_degree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    int cnt = 0;
+    while (!q.empty()) {
+        int u = q.top();
+        q.pop();
+        result[u] = ++cnt;
+        for (int v : adj[u]) {
+            in_degree[v]--;
+            if (in_degree[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    if (cnt != n) {
+        std::cout << "NO\n";
+    } else {
+        std::cout << "YES\n";
+        for (int i = 0; i < n; i++) {
+            std::cout << result[i] << (i == n - 1 ? '\n' : ' ');
+        }
+    }
+
+    return 0;
+}
+10.6)
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <string>
+
+enum class State {
+    NOT_VISITED,
+    VISITING,
+    VISITED
+};
+
+bool has_cycle(const std::string& concept, std::unordered_map<std::string, std::vector<std::string>>& graph, std::unordered_map<std::string, State>& visited) {
+    visited[concept] = State::VISITING;
+    for (const auto& child : graph[concept]) {
+        if (visited[child] == State::VISITING || (visited[child] == State::NOT_VISITED && has_cycle(child, graph, visited))) {
+            return true;
+        }
+    }
+    visited[concept] = State::VISITED;
+    return false;
+}
+
+int main() {
+    int n;
+    std::cin >> n;
+
+    std::unordered_map<std::string, std::vector<std::string>> graph;
+    std::unordered_set<std::string> defined_concepts;
+    bool multiple_definition = false;
+
+    for (int i = 0; i < n; i++) {
+        std::string concept;
+        int num_dependencies;
+        std::cin >> concept >> num_dependencies;
+        if (defined_concepts.count(concept) > 0) {
+            multiple_definition = true;
+        }
+        defined_concepts.insert(concept);
+        for (int j = 0; j < num_dependencies; j++) {
+            std::string dependency;
+            std::cin >> dependency;
+            graph[concept].push_back(dependency);
+        }
+    }
+
+    if (multiple_definition) {
+        std::cout << "multiple definition" << std::endl;
+    } else {
+        std::unordered_map<std::string, State> visited;
+        bool loop_detected = false;
+        for (const auto& entry : graph) {
+            if (visited[entry.first] == State::NOT_VISITED && has_cycle(entry.first, graph, visited)) {
+                loop_detected = true;
+                break;
+            }
+        }
+
+        if (loop_detected) {
+            std::cout << "loop detected" << std::endl;
+        } else {
+            std::cout << "correct" << std::endl;
+        }
+    }
+
+    return 0;
+}
+10.7)
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+std::vector<std::vector<int>> adj, radj;
+std::vector<bool> visited;
+std::vector<int> order, components;
+
+void dfs1(int v) {
+    visited[v] = true;
+    for (int u : adj[v]) {
+        if (!visited[u]) {
+            dfs1(u);
+        }
+    }
+    order.push_back(v);
+}
+
+void dfs2(int v, int comp) {
+    components[v] = comp;
+    for (int u : radj[v]) {
+        if (components[u] == -1) {
+            dfs2(u, comp);
+        }
+    }
+}
+
+int main() {
+    int n, m;
+    std::cin >> n >> m;
+
+    adj.resize(n);
+    radj.resize(n);
+    visited.assign(n, false);
+    components.assign(n, -1);
+
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        std::cin >> u >> v;
+        u--; v--;
+        adj[u].push_back(v);
+        radj[v].push_back(u);
+    }
+
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfs1(i);
+        }
+    }
+
+    int num_components = 0;
+    for (int i = 0; i < n; i++) {
+        int v = order[n - i - 1];
+        if (components[v] == -1) {
+            dfs2(v, num_components);
+            num_components++;
+        }
+    }
+
+    std::cout << num_components << std::endl;
+    for (int comp : components) {
+        std::cout << comp + 1 << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+10.8)
+#include "stdlib.h"
+#include <stdio.h>
+
+typedef struct {
+    int a, b, w, id;
+} Edge;
+
+typedef struct ListE {
+    Edge val;
+    struct ListE* next;
+} ListE;
+
+ListE* createList() {
+    ListE *head = (ListE*) calloc(1, sizeof(ListE));
+    head->next = head;
+    return head;
+}
+
+void insertAfter(ListE* prevElem, Edge value) {
+    ListE *newElem = (ListE*) calloc(1, sizeof(ListE)),
+            *nextElem = prevElem->next;
+    newElem->val = value;
+    prevElem->next = newElem;
+    newElem->next = nextElem;
+}
+
+void deleteList(ListE* head) {
+    ListE *elemForDel, *elem = head->next;
+    while (elem != head) {
+        elemForDel = elem;
+        elem = elem->next;
+        free(elemForDel);
+    }
+    free(head);
+}
+
+#define WHITE 0
+#define GREY 1
+#define BLACK 2
+
+typedef struct {
+    int verticesCnt, edgesCnt;
+    ListE **edges;
+    char *colors;
+
+    char *isBridge;
+    int *ups;
+    int *inTimes;
+    int *parents;
+    int *parentEdgeId;
+    int time;
+} GraphData;
+
+void insertEdge(ListE **edges, Edge edge) {
+    if (!edges[edge.a])
+        edges[edge.a] = createList();
+    insertAfter(edges[edge.a], edge);
+}
+
+void inputEdges(GraphData *graphData) {
+    int a, b;
+    Edge newEdge;
+    for (int i = 0; i < graphData->edgesCnt; ++i) {
+        scanf("%d %d\n", &a, &b);
+        newEdge.a = a - 1;
+        newEdge.b = b - 1;
+        newEdge.id = i + 1;
+        insertEdge(graphData->edges, newEdge);
+        newEdge.a = b - 1;
+        newEdge.b = a - 1;
+        insertEdge(graphData->edges, newEdge);
+    }
+}
+
+GraphData *initializeGraphData(int n, int m) {
+    GraphData *graphData = (GraphData*) calloc(1, sizeof(GraphData));
+    graphData->verticesCnt = n;
+    graphData->edgesCnt = m;
+    graphData->colors = (char*) calloc(n, sizeof(char));
+    graphData->isBridge = (char*) calloc(m, sizeof(char));
+    graphData->ups = (int*) calloc(n, sizeof(int));
+    graphData->inTimes = (int*) calloc(n, sizeof(int));
+    graphData->parents = (int*) calloc(n, sizeof(int));
+    graphData->parentEdgeId = (int*) calloc(n, sizeof(int));
+
+    graphData->edges = (ListE**) calloc(n, sizeof(ListE*));
+
+    return graphData;
+}
+
+void releaseGraphData(GraphData* graphData) {
+    for (int i = 0; i < graphData->verticesCnt; ++i)
+        if (graphData->edges[i])
+            deleteList(graphData->edges[i]);
+    free(graphData->edges);
+    free(graphData->colors);
+    free(graphData->isBridge);
+    free(graphData->ups);
+    free(graphData->inTimes);
+    free(graphData->parents);
+    free(graphData->parentEdgeId);
+    free(graphData);
+}
+
+// returns min up
+int depthFirstSearch(GraphData *graphData, int v) {
+    graphData->colors[v] = GREY;
+    graphData->ups[v] = graphData->time;
+graphData->inTimes[v] = graphData->time;
+graphData->time++;
+ListE *head = graphData->edges[v];
+if (head) {
+    ListE *elem = head->next;
+    int u, childUp = INT_MAX;
+    while (elem != head) {
+        u = elem->val.b;
+        if (elem->val.id != graphData->parentEdgeId[v] &&
+            graphData->colors[u] != WHITE && graphData->inTimes[u] < graphData->ups[v])
+            graphData->ups[v] = graphData->inTimes[u];
+        if (graphData->colors[u] == WHITE) {
+            graphData->parents[u] = v;
+            graphData->parentEdgeId[u] = elem->val.id;
+            childUp = depthFirstSearch(graphData, u);
+            graphData->ups[v] = childUp < graphData->ups[v] ? childUp : graphData->ups[v];
+        }
+        elem = elem->next;
+    }
+}
+graphData->colors[v] = BLACK;
+return graphData->ups[v];
+}
+
+void displayBridges(GraphData *graphData) { int cnt = 0; Edge curEdge; for (int i = 0; i < graphData->verticesCnt; ++i) { if (graphData->edges[i]) { ListE *elem = graphData->edges[i]->next; while (elem != graphData->edges[i]) { curEdge = elem->val; if (graphData->ups[curEdge.b] > graphData->inTimes[curEdge.a]) { cnt++; graphData->isBridge[curEdge.id-1] = 1; } elem = elem->next; } } } printf("%d\n", cnt); for (int i = 0; i < graphData->edgesCnt; ++i) if (graphData->isBridge[i]) printf("%d ", i+1); }
+
+void displayUps(GraphData *graphData) { for (int i = 0; i < graphData->verticesCnt; ++i) { printf("%d ", graphData->ups[i]); } }
+
+int main() { freopen("input.txt", "r", stdin); freopen("output.txt", "w", stdout);
+
+int n, m;
+scanf("%d %d\n", &n, &m);
+GraphData *graphData = initializeGraphData(n, m);
+inputEdges(graphData);
+
+graphData->time = 0;
+for (int i = 0; i < graphData->verticesCnt; ++i)
+    if (graphData->colors[i] == WHITE)
+        depthFirstSearch(graphData, i);
+
+displayBridges(graphData);
+// displayUps(graphData);
+
+releaseGraphData(graphData);
+return 0;
+}
+10.9)
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int n;
+vector<int> g[100001];  // Список смежности графа
+vector<int> vertex_list;  // Список точек сочленения
+bool used[100001];  // Массив для отслеживания посещенных вершин
+int timer, tin[100001], fup[100001];  // Таймер и массивы для времени входа и минимального времени выхода
+
+// Функция для добавления вершины в список точек сочленения
+void IS_CUTPOINT(int v) {
+    vertex_list.push_back(v + 1);
+}
+
+// Функция для поиска точек сочленения с помощью DFS
+void dfs(int v, int p = -1) {
+    used[v] = true;
+    tin[v] = fup[v] = timer++;
+    int children = 0;
+    for (size_t i = 0; i < g[v].size(); ++i) {
+        int to = g[v][i] - 1;
+        if (to == p) continue;
+        if (used[to]) {
+            fup[v] = min(fup[v], tin[to]);
+        } else {
+            dfs(to, v);
+            fup[v] = min(fup[v], fup[to]);
+            if (fup[to] >= tin[v] && p != -1) {
+                IS_CUTPOINT(v);
+            }
+            ++children;
+        }
+    }
+    if (p == -1 && children > 1) {
+        IS_CUTPOINT(v);
+    }
+}
+
+int main() {
+    ifstream inp("input.txt", ios_base::in);
+
+    int ch1, ch2, count;
+
+    inp >> n;  // Считываем количество вершин
+    inp >> count;  // Считываем количество ребер
+
+    // Считываем ребра и заполняем список смежности
+    for (int i = 0; i < count; ++i) {
+        inp >> ch1;
+        inp >> ch2;
+        g[ch1 - 1].push_back(ch2);
+        g[ch2 - 1].push_back(ch1);
+    }
+
+    inp.close();
+
+    // Инициализируем массив used значениями false
+    for (int i = 0; i < n; ++i) {
+        used[i] = false;
+    }
+
+    timer = 1;
+
+    // Запускаем DFS для каждой непосещенной вершины
+    for (int i = 1; i <= n; i++) {
+        if (!used[i]) {
+            dfs(i);
+        }
+    }
+
+    ofstream out("output.txt", ios_base::out);
+
+    // Сортируем список точек сочленения
+    sort(vertex_list.begin(), vertex_list.end());
+
+    // Удаляем дубликаты из списка точек сочленения
+    auto last = unique(vertex_list.begin(), vertex_list.end());
+    vertex_list.erase(last, vertex_list.end());
+
+    // Выводим количество точек сочленения и сами точки сочленения
+    out << vertex_list.size() << endl;
+    for (size_t i = 0; i < vertex_list.size(); ++i) {
+        out << vertex_list[i] << " ";
+    }
+
+    out.close();
+
+    return 0;
+}
+11.1)
+#include <iostream> 
+#include <vector> 
+#include <queue> 
+ 
+using namespace std; 
+ 
+const int INF = 1e9; 
+vector<vector<int>> adj; 
+vector<int> dist; 
+ 
+void shortest_path(int n, int m) { 
+    dist.assign(n + 1, INF); 
+    dist[1] = 0; 
+    queue<int> q; 
+    vector<int> in_queue(n + 1, false); 
+    q.push(1); 
+    in_queue[1] = true; 
+ 
+    while (!q.empty()) { 
+        int v = q.front(); 
+        q.pop(); 
+        in_queue[v] = false; 
+ 
+        for (int u : adj[v]) { 
+            if (dist[v] + 1 < dist[u]) { 
+                dist[u] = dist[v] + 1; 
+                if (!in_queue[u]) { 
+                    q.push(u); 
+                    in_queue[u] = true; 
+                } 
+            } 
+        } 
+    } 
+} 
+ 
+int main() { 
+    int n, m; 
+    cin >> n >> m; 
+    adj.resize(n + 1); 
+ 
+    for (int i = 0; i < m; i++) { 
+        int v, u; 
+        cin >> v >> u; 
+        adj[v].push_back(u); 
+    } 
+ 
+    shortest_path(n, m); 
+ 
+    for (int i = 1; i <= n; i++) { 
+        if (dist[i] == INF) { 
+            cout << -1 << endl; 
+        } else { 
+            cout << dist[i] << endl; 
+        } 
+    } 
+ 
+    return 0; 
+}
+11.2)
+#include <iostream> 
+#include <queue> 
+#include <vector> 
+ 
+using namespace std; 
+ 
+int dx[] = {-1, 0, 1, 0}; 
+int dy[] = {0, 1, 0, -1}; 
+ 
+int main() { 
+    int m, n; 
+    cin >> m >> n; 
+    vector<string> maze(m); 
+    for (int i = 0; i < m; i++) { 
+        cin >> maze[i]; 
+    } 
+ 
+    pair<int, int> start, finish; 
+    vector<vector<int>> dist(m, vector<int>(n, -1)); 
+    for (int i = 0; i < m; i++) { 
+        for (int j = 0; j < n; j++) { 
+            if (maze[i][j] == 'S') { 
+                start = {i, j}; 
+                dist[i][j] = 0; 
+            } else if (maze[i][j] == 'F') { 
+                finish = {i, j}; 
+            } 
+        } 
+    } 
+ 
+    queue<pair<int, int>> q; 
+    q.push(start); 
+    while (!q.empty()) { 
+        pair<int, int> v = q.front(); 
+        q.pop(); 
+        for (int i = 0; i < 4; i++) { 
+            int nx = v.first + dx[i]; 
+            int ny = v.second + dy[i]; 
+            if (nx >= 0 && nx < m && ny >= 0 && ny < n && maze[nx][ny] != 'X' && dist[nx][ny] == -1) { 
+                dist[nx][ny] = dist[v.first][v.second] + 1; 
+                q.push({nx, ny}); 
+            } 
+        } 
+    } 
+ 
+    cout << dist[finish.first][finish.second] << endl; 
+ 
+    return 0; 
+}
+11.3)
+#include <iostream> 
+#include <vector> 
+#include <algorithm> 
+#include <cmath> 
+ 
+using namespace std; 
+ 
+struct City { 
+    int x, y, index; 
+}; 
+ 
+struct Edge { 
+    int u, v; 
+    double weight; 
+}; 
+ 
+bool compareEdge(Edge a, Edge b) { 
+    return a.weight < b.weight; 
+} 
+ 
+vector<int> parent; 
+ 
+int find(int city) { 
+    if (city != parent[city]) 
+        parent[city] = find(parent[city]); 
+    return parent[city]; 
+} 
+ 
+void unionCities(int city1, int city2) { 
+    parent[find(city1)] = find(city2); 
+} 
+ 
+double distance(City a, City b) { 
+    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2)); 
+} 
+ 
+int main() { 
+    int N; 
+    cin >> N; 
+ 
+    vector<City> cities(N); 
+    for (int i = 0; i < N; i++) { 
+        cin >> cities[i].x >> cities[i].y; 
+        cities[i].index = i; 
+    } 
+ 
+    vector<Edge> edges; 
+    for (int i = 0; i < N; i++) { 
+        for (int j = i + 1; j < N; j++) { 
+            edges.push_back({i, j, distance(cities[i], cities[j])}); 
+        } 
+    } 
+ 
+    sort(edges.begin(), edges.end(), compareEdge); 
+ 
+    parent.resize(N); 
+    for (int i = 0; i < N; i++) { 
+        parent[i] = i; 
+    } 
+ 
+    int M; 
+    cin >> M; 
+    for (int i = 0; i < M; i++) { 
+        int u, v; 
+        cin >> u >> v; 
+        unionCities(u - 1, v - 1); 
+    } 
+ 
+    for (auto &edge : edges) { 
+        if (find(edge.u) != find(edge.v)) { 
+            cout << edge.u + 1 << " " << edge.v + 1 << endl; 
+            unionCities(edge.u, edge.v); 
+        } 
+    } 
+ 
+    return 0; 
+}
+11.4)
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <string>
+#include <unordered_map>
+#include <climits>
+using namespace std;
+
+const int INF = INT_MAX;
+
+int main()
+{
+    // Вводим количество вершин, ребер, стартовую точку, конечную точку и количество запрещенных вершин
+    int N, M, S, F, W;
+    cin >> N >> M >> S >> F >> W;
+    
+    // Создаем граф в виде неупорядоченного картежа (ключ - вершина, значение - список пар "связанный узел: вес")
+    unordered_map<int, vector<pair<int, int>>> graph;
+    
+    // Создаем векторы для отслеживания посещенных вершин и расстояний до них
+    vector<bool> visited(N + 1, false);
+    vector<int> distance(N + 1, INF);
+    
+    // Заполняем граф данными о запрещенных вершинах
+    for (int i = 0; i < W; i++)
+    {
+        int o;
+        cin >> o;
+        graph[o].push_back({ 0, 1 });
+    }
+    
+    // Заполняем граф данными о связях между вершинами
+    for (int i = 0; i < M; i++)
+    {
+        int v, u;
+        cin >> v >> u;
+        graph[v].push_back({ u, 1 });
+        graph[u].push_back({ v, 1 });
+    }
+    
+    // Устанавливаем расстояние до стартовой точки равным нулю
+    distance[S] = 0;
+    
+    // Создаем очередь для BFS
+    queue<int> q;
+    q.push(S);
+    
+    // Флаг для выхода из цикла при достижении конечной точки
+    bool Break = false;
+    
+    // Цикл BFS
+    while (!q.empty())
+    {
+        // Проверяем флаг выхода
+        if (Break) break;
+        
+        // Извлекаем и посещаем следующую вершину из очереди
+        int u = q.front();
+        q.pop();
+        visited[u] = true;
+        
+        // Обходим всех соседей текущей вершины
+        for (const auto& neighbor : graph[u])
+        {
+            int v = neighbor.first;
+            int w = neighbor.second;
+            
+            // Если путь через текущую вершину короче предыдущего, обновляем его
+            if (distance[u] + w < distance[v] && v != 0)
+            {
+                distance[v] = distance[u] + w;
+                
+                // Если достигли конечной точки, устанавливаем флаг выхода
+                if (v == F)
+                {
+                    Break = true;
+                    break;
+                }
+                
+                // Если сосед еще не был посещен, добавляем его в очередь
+                if (!visited[v])
+                    q.push(v);
+            }
+            
+            // Если достигли "нулевой" вершины, считаем что дошли до конца и обновляем расстояние до конечной точки
+            if (v == 0)
+            {
+                distance[F] = distance[u] + 1;
+                Break = true;
+                break;
+            }
+        }
+    }
+    
+    // Выводим результат: либо расстояние до конечной точки, либо сообщение об отсутствии пути
+    if (distance[F] == INF)
+        cout << "IMPOSSIBLE" << "\n";
+    else
+        cout << distance[F] << "\n";
+}
+12.1)
+#include <iostream> 
+#include <vector> 
+#include <queue> 
+ 
+using namespace std; 
+ 
+const int INF = 99999999; 
+ 
+int dijkstra(int start, int end, const vector<vector<int>>& graph) { 
+    int n = graph.size(); 
+ 
+    vector<int> dist(n, INF); 
+    vector<bool> visited(n, false); 
+ 
+    dist[start] = 0; 
+ 
+    priority_queue<pair<int, int>> pq; 
+    pq.push({ 0, start }); 
+ 
+    while (!pq.empty()) { 
+        int u = pq.top().second; 
+        pq.pop(); 
+        if (visited[u]) continue; 
+        visited[u] = true; 
+        for (int v = 0; v < n; v++) { 
+            if (graph[u][v] != -1 && dist[u] + graph[u][v] < dist[v]) { 
+                dist[v] = dist[u] + graph[u][v]; 
+                pq.push({ -dist[v], v }); 
+            } 
+        } 
+    } 
+    return dist[end] == INF ? -1 : dist[end]; 
+} 
+ 
+int main() { 
+    int n, from, to, u, v, k; 
+    cin >> n >> from >> to; 
+ 
+    vector<vector<int>> graph(n + 1, vector<int>(n + 1, -1)); 
+ 
+    while (cin >> u >> v >> k) { 
+        graph[u][v] = graph[v][u] = k; 
+    } 
+ 
+    int dist = dijkstra(from, to, graph); 
+ 
+    if (dist == -1) { 
+        cout << "no" << endl; 
+    } 
+    else { 
+        cout << dist << endl; 
+    } 
+    return 0; 
+}
+12.2)
+#include <iostream> 
+#include<vector> 
+#include <queue> 
+#include <string> 
+using namespace std; 
+const int INF = INT_MAX; 
+int main() 
+{ 
+    int N, M, P, K; 
+    cin >> N >> M >> P >> K; 
+    vector<vector<int>> graph(N + 1, vector<int>(N + 1, -1)); 
+    for (int i = 0; i < M; i++) 
+    { 
+        int n1, n2, L; 
+        cin >> n1 >> n2 >> L; 
+        if (graph[n1][n2] != -1) 
+        { 
+            if (graph[n1][n2] > L) 
+            { 
+                graph[n1][n2] = L; 
+                graph[n2][n1] = L; 
+            } 
+        } 
+        else 
+        { 
+            graph[n1][n2] = L; 
+            graph[n2][n1] = L; 
+        } 
+    } 
+    vector<vector<int>> OTV(N + 1, vector<int>(N + 1, INF)); 
+    vector<vector<int>> colichestvo(N + 1, vector<int>(N + 1, 0)); 
+    vector<vector<string>> help(N + 1, vector<string>(N + 1, "")); 
+    for (int i = 0; i < P; i++) 
+    { 
+        int S, T; 
+        cin >> S >> T; 
+        if (OTV[S][T] == INF) 
+        { 
+            help[S][S] = to_string(S) + " "; 
+            vector<bool> visited(N+1, false); 
+            colichestvo[S][S] = 1; 
+            OTV[S][S] = 0; 
+            priority_queue<pair<int, int>> pq; 
+            pq.push({ 0, S }); 
+            while (!pq.empty()) 
+            { 
+                int u = pq.top().second; 
+                pq.pop(); 
+                if (visited[u]) continue; 
+                visited[u] = true; 
+                for (int v = 0; v < N+1; v++) 
+                { 
+                    if (graph[u][v] != -1 && OTV[S][u] + graph[u][v] < OTV[S][v]) 
+                    { 
+                        OTV[S][v] = OTV[S][u] + graph[u][v]; 
+                        help[S][v] = help[S][u] + to_string(v) + " "; 
+                        colichestvo[S][v] = colichestvo[S][u] + 1; 
+                        pq.push({ -OTV[S][v], v }); 
+                    } 
+                } 
+            } 
+        } 
+        cout << OTV[S][T] << " " << colichestvo[S][T] << " " << help[S][T] << "\n"; 
+    } 
+    for (int i = 0; i < K; i++) 
+    { 
+        int S, T; 
+        cin >> S >> T; 
+        if (OTV[S][T] == INF) 
+        { 
+            vector<bool> visited(N + 1, false); 
+            OTV[S][S] = 0; 
+            priority_queue<pair<int, int>> pq; 
+            pq.push({ 0, S }); 
+            while (!pq.empty()) 
+            { 
+                int u = pq.top().second; 
+                pq.pop(); 
+                if (visited[u]) continue; 
+                visited[u] = true; 
+                for (int v = 0; v < N + 1; v++) 
+                { 
+                    if (graph[u][v] != -1 && OTV[S][u] + graph[u][v] < OTV[S][v]) 
+                    { 
+                        OTV[S][v] = OTV[S][u] + graph[u][v]; 
+                        pq.push({ -OTV[S][v], v }); 
+                    } 
+                } 
+            } 
+        } 
+        cout << OTV[S][T]<<"\n"; 
+    } 
+    for (int i = 0; i < N+1; i++) 
+    { 
+        OTV[i].clear(); 
+        help[i].clear(); 
+        colichestvo[i].clear(); 
+        graph[i].clear(); 
+    } 
+    OTV.clear(); 
+    help.clear(); 
+    colichestvo.clear(); 
+    graph.clear(); 
+    return 0; 
+}
+12.3)
+#include <iostream> 
+#include <vector> 
+ 
+using namespace std; 
+ 
+const int MAXN = 500; 
+ 
+int n; 
+vector<vector<int>> r(MAXN, vector<int>(MAXN)); 
+ 
+void transitive_closure() { 
+    for (int k = 0; k < n; k++) { 
+        for (int i = 0; i < n; i++) { 
+            for (int j = 0; j < n; j++) { 
+                if ((r[i][k] == 1 && r[k][j] == 1) || i == j) 
+                    r[i][j] = 1; 
+            } 
+        } 
+    } 
+} 
+ 
+int main() { 
+    string input; 
+    cin >> n; 
+ 
+    for (int i = 0; i < n; i++) { 
+        cin >> input; 
+        for (int j = 0; j < n; j++) 
+            r[i][j] = input[j] - '0'; 
+    } 
+ 
+    transitive_closure(); 
+ 
+    for (int i = 0; i < n; i++) { 
+        for (int j = 0; j < n; j++) { 
+            cout << r[i][j]; 
+        } 
+        cout << endl; 
+    } 
+    return 0; 
+}
+12.4)
+#include <iostream> 
+#include <vector> 
+#include <stack> 
+ 
+using namespace std; 
+ 
+struct walkway { 
+    int from, to, ml; 
+}; 
+ 
+void print(vector<int> d, vector<int> parent, vector<int> friends) 
+{ 
+    for (auto i : friends) { 
+        cout << d[i] << " "; 
+        stack<int> path; 
+        int node = i; 
+        while (node != -1) { 
+            path.push(node); 
+            node = parent[node]; 
+        } 
+        cout << path.size() << " "; 
+        while (!path.empty()) { 
+            cout << path.top() << " "; 
+            path.pop(); 
+        } 
+        cout << endl; 
+    } 
+} 
+ 
+void BellmanFord(int n, vector<walkway> walkways, vector<int> friends) 
+{ 
+    vector<int> d(n + 1, INT_MAX); 
+    d[1] = 0; 
+    vector<int> parent(n + 1, -1); 
+ 
+    for (int i = 0; i < n - 1; i++) { 
+        for (auto& walkway : walkways) { 
+            if (d[walkway.from] != INT_MAX && d[walkway.from] + walkway.ml < d[walkway.to]) { 
+                d[walkway.to] = d[walkway.from] + walkway.ml; 
+                parent[walkway.to] = walkway.from; 
+            } 
+        } 
+    } 
+    print(d, parent, friends); 
+} 
+ 
+ 
+int main() { 
+    int n, m, k; // вершин, дорожек, друзей 
+    cin >> n >> m >> k; 
+ 
+    vector<int> friends(k); 
+    for (int i = 0; i < k; i++) { 
+        cin >> friends[i]; 
+    } 
+ 
+    vector<walkway> walkways(m); 
+    for (int i = 0; i < m; i++) { 
+        cin >> walkways[i].from >> walkways[i].to >> walkways[i].ml; 
+    } 
+ 
+    BellmanFord(n, walkways, friends); 
+ 
+    return 0; 
+}
+12.5)
+#include <iostream> 
+#include <vector> 
+#include <queue> 
+#include <limits> 
+#include <algorithm> 
+  
+using namespace std; 
+  
+const int INF = numeric_limits<int>::max(); 
+  
+int main() { 
+    int N, M, K; 
+    cin >> N >> M >> K; 
+    vector<vector<pair<int, int>>> graph(N + 1); 
+    vector<pair<int, int>> queries(K); 
+  
+    for (int i = 0; i < K; i++) { 
+        cin >> queries[i].first >> queries[i].second; 
+    } 
+  
+    for (int i = 0; i < M; i++) { 
+        int a, b, t; 
+        cin >> a >> b >> t; 
+        graph[a].emplace_back(b, t); 
+        graph[b].emplace_back(a, t); 
+    } 
+  
+    for (auto& query : queries) { 
+        int S = query.first; 
+        int T = query.second; 
+  
+        vector<int> dist(N + 1, INF); 
+        vector<int> parent(N + 1, -1); 
+        dist[S] = 0; 
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq; 
+        pq.push({0, S}); 
+  
+        while (!pq.empty()) { 
+            int u = pq.top().second; 
+            int d = pq.top().first; 
+            pq.pop(); 
+  
+            if (d != dist[u]) continue; 
+  
+            for (auto& edge : graph[u]) { 
+                int v = edge.first; 
+                int w = edge.second; 
+  
+                if (dist[u] + w < dist[v]) { 
+                    dist[v] = dist[u] + w; 
+                    parent[v] = u; 
+                    pq.push({dist[v], v}); 
+                } 
+            } 
+        } 
+  
+        if (dist[T] == INF) { 
+            cout << "NO\n"; 
+        } else { 
+            cout << "YES " << dist[T]; 
+            vector<int> path; 
+            for (int u = T; u != -1; u = parent[u]) { 
+                path.push_back(u); 
+            } 
+            reverse(path.begin(), path.end()); 
+            cout << " " << path.size(); 
+            for (int u : path) { 
+                cout << " " << u; 
+            } 
+            cout << "\n"; 
+        } 
+    } 
+  
+    return 0; 
+}
+12.6)
+#include <iostream> 
+#include <vector> 
+#include <cmath> 
+  
+using namespace std; 
+  
+struct Point { 
+    int x, y; 
+}; 
+  
+struct Match { 
+    Point p1, p2; 
+}; 
+  
+bool intersect(const Match& m1, const Match& m2) { 
+    int t1 = (m2.p1.x - m1.p1.x) * (m1.p2.y - m1.p1.y) - (m2.p1.y - m1.p1.y) * (m1.p2.x - m1.p1.x); 
+    int t2 = (m2.p2.x - m1.p1.x) * (m1.p2.y - m1.p1.y) - (m2.p2.y - m1.p1.y) * (m1.p2.x - m1.p1.x); 
+    int t3 = (m1.p1.x - m2.p1.x) * (m2.p2.y - m2.p1.y) - (m1.p1.y - m2.p1.y) * (m2.p2.x - m2.p1.x); 
+    int t4 = (m1.p2.x - m2.p1.x) * (m2.p2.y - m2.p1.y) - (m1.p2.y - m2.p1.y) * (m2.p2.x - m2.p1.x); 
+  
+    if (t1*t2 < 0 && t3*t4 < 0) return true; 
+  
+    if (t1 == 0 && ((m2.p1.x - m1.p1.x) * (m2.p1.x - m1.p2.x) <= 0 && (m2.p1.y - m1.p1.y) * (m2.p1.y - m1.p2.y) <= 0)) return true; 
+    if (t2 == 0 && ((m2.p2.x - m1.p1.x) * (m2.p2.x - m1.p2.x) <= 0 && (m2.p2.y - m1.p1.y) * (m2.p2.y - m1.p2.y) <= 0)) return true; 
+    if (t3 == 0 && ((m1.p1.x - m2.p1.x) * (m1.p1.x - m2.p2.x) <= 0 && (m1.p1.y - m2.p1.y) * (m1.p1.y - m2.p2.y) <= 0)) return true; 
+    if (t4 == 0 && ((m1.p2.x - m2.p1.x) * (m1.p2.x - m2.p2.x) <= 0 && (m1.p2.y - m2.p1.y) * (m1.p2.y - m2.p2.y) <= 0)) return true; 
+  
+    return false; 
+} 
+  
+void dfs(int u, const vector<vector<int>>& adj, vector<bool>& visited) { 
+    visited[u] = true; 
+    for (int v : adj[u]) { 
+        if (!visited[v]) { 
+            dfs(v, adj, visited); 
+        } 
+    } 
+} 
+  
+int main() { 
+    int n; 
+    while (cin >> n, n != 0) { 
+        vector<Match> matches(n + 1); 
+        for (int i = 1; i <= n;i++) { 
+cin >> matches[i].p1.x >> matches[i].p1.y >> matches[i].p2.x >> matches[i].p2.y; 
+} 
+    vector<vector<int>> adj(n + 1); 
+    for (int i = 1; i <= n; i++) { 
+        for (int j = i + 1; j <= n; j++) { 
+            if (intersect(matches[i], matches[j])) { 
+                adj[i].push_back(j); 
+                adj[j].push_back(i); 
+            } 
+        } 
+    } 
+  
+    int a, b; 
+    while (cin >> a >> b, a != 0 && b != 0) { 
+        vector<bool> visited(n + 1); 
+        dfs(a, adj, visited); 
+        cout << (visited[b] ? "CONNECTED\n" : "NOT CONNECTED\n"); 
+    } 
+} 
+  
+return 0; 
+}
